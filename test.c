@@ -5,9 +5,9 @@ typedef uint32_t msg;
 typedef uint32_t word;
 
 typedef struct {
-		int sign;
-		int word_len;
-		word* a;
+	int sign;
+	int word_len;
+	word* a;
 } bigint;
 
 /* bigint <- array */
@@ -31,17 +31,17 @@ msg bi_refine(bigint* dst); // 메모리 조정
 msg bi_assign(bigint* dst, bigint* src);
 
 int main() {
-		//puts("HELLO KMU!!");
+	//puts("HELLO KMU!!");
 		
-		bigint a, b, c;
-		/*
-				a = -0x123213129389213
-				b = 0x1fffff9389213
-				a = b
-		*/
-		bi_set_from_string(&a, "-0x123213129389213", 16);
-		bi_set_from_string(&b, "0x1fffff9389213", 16);
-		bi_assign(&a, &b);
-		
-		return 0;
+	bigint a, b, c;
+	/*
+		a = -0x123213129389213
+		b = 0x1fffff9389213
+		a = b
+	*/
+	bi_set_from_string(&a, "-0x123213129389213", 16);
+	bi_set_from_string(&b, "0x1fffff9389213", 16);
+	bi_assign(&a, &b);
+	
+	return 0;
 }
