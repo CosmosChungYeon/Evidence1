@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #include "basic_func.h"
 #include "config.h"
 #include "bi_def.h"
