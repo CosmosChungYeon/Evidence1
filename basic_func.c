@@ -5,8 +5,12 @@
 #include <time.h>       // bi_gen_random
 
 #include "basic_func.h"
+#include "config.h"
+#include "bi_def.h"
 #include "msg.h"
-//int g_a = 0;
+#include "const.h"
+
+
 /* array로부터 bigint Set */
 msg bi_set_from_array(bigint** dst, int sign, int word_len, word* a) {
 
@@ -51,22 +55,6 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
     if (int_str[0] == '-'){
         sign = 1;
         int_str++;
-    }
-
-    /* 진수 확인 (10진수는 접두사 없음)*/
-    /* 2진수, 16진수 */
-    if (base == 2 && strncmp(int_str, "0b", 2) == 0) {
-        int_str += 2;
-    }
-    else if (base == 16 && strncmp(int_str, "0x", 2) == 0) {
-        int_str += 2;
-    }
-    else if (base == 10){
-        // 그대로 사용
-    }
-    else {
-        puts(UnSupportBaseErrMsg);
-        return UnSupportBaseErr;
     }
 
     /* 진수에 따른 문자열 유효성 검사 */
@@ -171,7 +159,6 @@ msg bi_get_random(bigint** dst, int word_len) {
     (*dst)->word_len = word_len;
 
     /* 워드 배열에 임의의 값 입력 */
-    srand(time(NULL));  // 바깥에서
     for (int i = 0; i < word_len; i++) {
         (*dst)->a[i] = ((word)rand() << 16) | (word)rand();  // 32비트 채우기
     }
@@ -185,7 +172,7 @@ msg bi_get_random(bigint** dst, int word_len) {
 }
 
 /* 진수 출력 */
-msg bi_print(bigint* dst, int base) {
+msg bi_print(const bigint* dst, int base) {
     /* bigint NULL 체크 */
     if (dst == NULL || dst->word_len <= 0 || dst->a == NULL) {
         puts(DSTpNULLErrMsg);
@@ -352,51 +339,4 @@ msg bi_assign(bigint** dst, bigint* src) {
     memcpy((*dst)->a, src->a, src->word_len * sizeof(word));
 
 	return CLEAR;
-}
-
-int main() {
-	bigint* number; // bigint 구조체 포인터 초기화
-    bigint* number2 = NULL;
-    bigint* copy = NULL;   // assign 테스트용
-    msg result;
-
-    // 1. bi_set_from_array 테스트
-    word arr[] = {0x12345678, 0x9ABCDEF0};
-    result = bi_set_from_array(&number, 0, 2, arr);
-    printf("bi_set_from_array result: %d\n", result);
-    bi_print(number, 16);
-
-    // 2. bi_set_from_string 테스트 (16진수)
-    result = bi_set_from_string(&number, "0x11234GG56789", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(number, 16);
-
-    // 3. bi_set_from_string 테스트 (16진수)
-    result = bi_set_from_string(&number, "-0x11A2B3C4D", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(number, 2);
-
-    // 4. bi_get_random 테스트
-    result = bi_get_random(&number, 2);
-    printf("bi_get_random result: %d\n", result);
-    bi_print(number, 2);
-
-    // 5. bi_assign 테스트
-    result = bi_assign(&copy, number);
-    printf("bi_assign result: %d\n", result);
-    printf("Copied bigint:\n");
-    bi_print(copy, 2);
-
-    // 6. bi_refine 테스트
-    result = bi_set_from_string(&number, "0b0000000000000000000000000000000000000000001111001010101", 2);
-    printf("%d\n", number->word_len);
-    bi_print(number, 2);
-
-    // 7. bi_delete 테스트
-    bi_delete(&number);
-    if (number == NULL) {
-        printf("bi_delete successful.\n");
-    }
-
-    return 0;
 }

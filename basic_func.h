@@ -1,27 +1,10 @@
 #ifndef BASIC_FUNC_H
 #define BASIC_FUNC_H
 
-#include <stdio.h>
-#include <stdint.h>
-
-typedef uint32_t msg;	// config.h
-typedef uint32_t word;
-
-// constant.h
-#define NON_NEGATIVE 0	// 양수
-#define NEGATIVE 	 1	// 음수
-
-/* bigint 구조체 */ // bi_def.c
-typedef struct {
-	int sign;		// 부호값
-	int word_len;	// 워드 길이
-	word* a;		// 워드 배열
-} bigint;
-
-typedef bigint* pbigint; // 참고
-
-#define OUT
-#define IN
+#include "config.h"
+#include "bi_def.h"
+#include "msg.h"
+#include "const.h"
 
 /* array로부터 bigint Set */
 msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN word* a);
