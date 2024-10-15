@@ -12,5 +12,6 @@ typedef struct {
 
 #define OUT
 #define IN
+#define UPDATE
 
 #endif  // BI_DEF_H

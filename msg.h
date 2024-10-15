@@ -10,6 +10,7 @@
 #define SignValErr          0x0200   // 부호값 오류
 #define WordLenErr          0x0201   // 워드 길이 오류
 #define StrNULLErr          0x0202   // 문자열 NULL 오류
+#define NOTInitErr          0x0203
 
 #define UnSupportBaseErr    0x0300   // 지원하지 않는 Base 오류
 #define BinInputErr         0x0301   // 2진수 입력 유효성 오류
@@ -26,5 +27,6 @@
 #define HexInputErrMsg      "Error: Invalid hexadecimal value (0~9, a~f, A~F)"
 #define SrcArrNULLErrMsg    "Error: Source array is NULL"
 #define DSTpNULLErrMsg      "Error: Destination pointer is NULL"
+#define NOTInitErrMsg       "Error: Failed to initialize array"
 
 #endif  // MSG_H

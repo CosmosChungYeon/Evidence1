@@ -1,34 +1,30 @@
 #include <stdio.h>      // printf
 #include <stdlib.h>     // calloc, realloc
-#include <stdint.h>     // uint32_t
 #include <string.h>     // strlen
-#include <time.h>       // bi_gen_random
-
+ 
 #include "basic_func.h"
-#include "config.h"
-#include "bi_def.h"
 #include "msg.h"
 #include "const.h"
-
+#include "array_func.h"
 
 /* array로부터 bigint Set */
 msg bi_set_from_array(bigint** dst, int sign, int word_len, word* a) {
 
     /* 부호값 체크 */
     if (sign != 0 && sign != 1){
-        puts(SignValErrMsg);    // fprintf
+        fprintf(stderr, SignValErrMsg);    // fprintf
         return SignValErr;
     }
 
     /* 워드 길이 체크 */
     if (word_len <= 0 ){
-        puts(WordLenErrMsg);
+        fprintf(stderr, WordLenErrMsg);
         return WordLenErr;
     }
 
     /* a 배열 NULL인지 체크 */
     if (a == NULL){
-        puts(SrcArrNULLErrMsg);
+        fprintf(stderr, SrcArrNULLErrMsg);
         return SrcArrNULLErr;
     }
 
@@ -46,7 +42,7 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
 
     /* 문자열 NULL 체크 */
     if (int_str == NULL) {
-        puts(StrNULLErrMsg);
+        fprintf(stderr, StrNULLErrMsg);
         return StrNULLErr;
     }
 
@@ -62,7 +58,7 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
     while (int_str[i] != '\0') {
         if (base == 2) {
             if (int_str[i] != '0' && int_str[i] != '1') {
-                puts(BinInputErrMsg);
+                fprintf(stderr, BinInputErrMsg);
                 return BinInputErr;
             }
         } 
@@ -70,18 +66,18 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
             if (!((int_str[i] >= '0' && int_str[i] <= '9') || 
                 (int_str[i] >= 'a' && int_str[i] <= 'f') || 
                 (int_str[i] >= 'A' && int_str[i] <= 'F'))) {
-                puts(HexInputErrMsg);
+                fprintf(stderr, HexInputErrMsg);
                 return HexInputErr;
             }
         }
         else if (base == 10) {
             if (!(int_str[i] >= '0' && int_str[i] <= '9')) {
-                puts(DecInputErrMsg);
+                fprintf(stderr, DecInputErrMsg);
                 return DecInputErr;
             }
         }
         else {
-            puts(UnSupportBaseErrMsg);
+            fprintf(stderr, UnSupportBaseErrMsg);
             return UnSupportBaseErr;
         }
         i++;
@@ -93,10 +89,10 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
 
     // base에 따라 word_len 계산
     if (base == 2) {
-        word_len = (str_len / (sizeof(word) << 3)) + (str_len % (sizeof(word) << 3) != 0);
+        word_len = (str_len / BINARY_STRING_LENGTH) + (str_len % BINARY_STRING_LENGTH != 0);
     }
     else if (base == 16) {
-        word_len = (str_len / (sizeof(word) << 1)) + (str_len % (sizeof(word) << 1) != 0);
+        word_len = (str_len / HEX_STRING_LENGTH) + (str_len % HEX_STRING_LENGTH != 0);
     }
     else if (base == 10) {
 
@@ -137,37 +133,28 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
 
 /* 임의의 값으로 bigint 초기화 */
 /* 마지막 원소가 nonzero여야 함 */
-msg bi_get_random(bigint** dst, int word_len) {
+msg bi_get_random(OUT bigint** dst, IN int sign, IN int word_len) {
     /* NULL 체크 */
     if (*dst == NULL) {
-        puts(DSTpNULLErrMsg);
+        fprintf(stderr, DSTpNULLErrMsg);
         return DSTpNULLErr;
     }
 
     /* 워드 길이 체크 */
     if (word_len <= 0) {
-        puts(WordLenErrMsg);
+        fprintf(stderr, WordLenErrMsg);
         return WordLenErr;
     }
 
     /* 워드 메모리 할당 */
     (*dst)->a = (word*)calloc(word_len, sizeof(word));
     if ((*dst)->a == NULL) {
-        puts(MemAllocErrMsg);
+        fprintf(stderr, MemAllocErrMsg);
         return MemAllocErr;
     }
     (*dst)->word_len = word_len;
 
-    /* 워드 배열에 임의의 값 입력 */
-    for (int i = 0; i < word_len; i++) {
-        (*dst)->a[i] = ((word)rand() << 16) | (word)rand();  // 32비트 채우기
-    }
-
-    /* 마지막 원소가 nonzero여야 함 */
-    while ((*dst)->a[word_len - 1] == 0) {
-        (*dst)->a[word_len - 1] = ((word)rand() << 16) | (word)rand();  // DRBG 붙이기 용이하게
-    }
-
+    array_rand((*dst)->a, word_len);
     return CLEAR;
 }
 
@@ -175,13 +162,13 @@ msg bi_get_random(bigint** dst, int word_len) {
 msg bi_print(const bigint* dst, int base) {
     /* bigint NULL 체크 */
     if (dst == NULL || dst->word_len <= 0 || dst->a == NULL) {
-        puts(DSTpNULLErrMsg);
+        fprintf(stderr, DSTpNULLErrMsg);
         return DSTpNULLErr;
     }
 
     /* 진수 체크 */
     if (base != 2 && base != 16) {
-        puts(UnSupportBaseErrMsg);
+        fprintf(stderr, UnSupportBaseErrMsg);
         return UnSupportBaseErr;
     }
 
@@ -202,7 +189,7 @@ msg bi_print(const bigint* dst, int base) {
         printf("0b");
         int leading_zero = 1;  // 처음의 0들을 건너뛰기 위한 플래그
         for (int i = dst->word_len - 1; i >= 0; i--) {
-            for (int j = (sizeof(word) << 3) - 1; j >= 0; j--) {
+            for (int j = WORD_BIT - 1; j >= 0; j--) {
                 int bit = (dst->a[i] >> j) & 1;  // 해당 비트를 추출
                 if (bit == 1) {
                     leading_zero = 0;  // 처음으로 1을 만나면 leading_zero 해제
@@ -231,14 +218,14 @@ msg bi_new(bigint** dst, int word_len) {
 
     /* 워드 길이 체크 */
     if (word_len <= 0 ){
-        puts(WordLenErrMsg);
+        fprintf(stderr, WordLenErrMsg);
         return WordLenErr;
     }
 
     /* bigint 메모리 할당 */
     *dst = (bigint*)calloc(1, sizeof(bigint));
     if (*dst == NULL) {
-        puts(MemAllocErrMsg);
+        fprintf(stderr, MemAllocErrMsg);
         return MemAllocErr;
     }
 
@@ -247,7 +234,7 @@ msg bi_new(bigint** dst, int word_len) {
     (*dst)->word_len = word_len;
     (*dst)->a = (word*)calloc(word_len, sizeof(word));
     if ((*dst)->a == NULL) {
-        puts(MemAllocErrMsg);
+        fprintf(stderr, MemAllocErrMsg);
         free(*dst);
         return MemAllocErr;
     }
@@ -265,12 +252,10 @@ msg bi_delete(bigint** dst) {
 	(*dst)->sign = NON_NEGATIVE;
 	(*dst)->word_len = 0;
 
-	if ((*dst)->a != NULL){
-		free((*dst)->a);
-		(*dst)->a = NULL;
-	}
+    array_init((*dst)->a, (*dst)->word_len);
 
     /* 메모리 해제 */
+    free((*dst)->a);
 	free(*dst);
 	*dst = NULL;
 
@@ -281,7 +266,7 @@ msg bi_delete(bigint** dst) {
 msg bi_refine(bigint* dst) {
     /* bigint NULL 체크 */
 	if (dst == NULL) {
-		puts(DSTpNULLErrMsg);
+		fprintf(stderr, DSTpNULLErrMsg);
 		return DSTpNULLErr;
 	}
 
@@ -295,7 +280,7 @@ msg bi_refine(bigint* dst) {
 	if (new_word_len != dst->word_len){
 		word* new_a = (word*)realloc(dst->a, new_word_len * sizeof(word));
 		if (new_a == NULL){
-			puts(MemAllocErrMsg);
+			fprintf(stderr, MemAllocErrMsg);
 			return(MemAllocErr);
 		}
 		dst->a = new_a;
@@ -309,7 +294,7 @@ msg bi_refine(bigint* dst) {
 msg bi_assign(bigint** dst, bigint* src) {
     /* Source 에러 체크 */
     if (src == NULL || src->a == NULL || src->word_len <= 0) { 
-        puts(SrcArrNULLErrMsg);
+        fprintf(stderr, SrcArrNULLErrMsg);
         return SrcArrNULLErr;
     }
 
@@ -332,7 +317,7 @@ msg bi_assign(bigint** dst, bigint* src) {
 
 	(*dst)->a = (word*)calloc(src->word_len, sizeof(word));
 	if ((*dst)->a == NULL){
-		puts(MemAllocErrMsg);
+		fprintf(stderr, MemAllocErrMsg);
 		return MemAllocErr;
 	}
 
