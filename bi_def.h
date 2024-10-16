@@ -10,8 +10,8 @@ typedef struct {
 	word* a;		// 워드 배열
 } bigint;
 
-#define OUT
-#define IN
-#define UPDATE
+#define OUT			// OUTPUT 
+#define IN			// INPUT
+#define UPDATE		// UPDATE
 
 #endif  // BI_DEF_H

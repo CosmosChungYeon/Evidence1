@@ -7,17 +7,21 @@
 #include "const.h"
 #include "array_func.h"
 
-/* array로부터 bigint Set */
-msg bi_set_from_array(bigint** dst, int sign, int word_len, word* a) {
+/*
+ * 함수명: bi_set_from_array
+ * 함수인자: OUT bigint** dst, IN int sign, IN int word_len, IN const word* a
+ * 함수역할: sign, word_len, array로부터 bigint setting
+ */
+msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const word* a) {
 
     /* 부호값 체크 */
-    if (sign != 0 && sign != 1){
-        fprintf(stderr, SignValErrMsg);    // fprintf
+    if (sign != NON_NEGATIVE && sign != NEGATIVE){
+        fprintf(stderr, SignValErrMsg);
         return SignValErr;
     }
 
     /* 워드 길이 체크 */
-    if (word_len <= 0 ){
+    if (word_len <= NON_NEGATIVE ){
         fprintf(stderr, WordLenErrMsg);
         return WordLenErr;
     }
@@ -34,11 +38,16 @@ msg bi_set_from_array(bigint** dst, int sign, int word_len, word* a) {
     (*dst)->sign = sign;
     memcpy((*dst)->a, a, word_len * sizeof(word));
 
-    return bi_refine(*dst);
+    return bi_refine(*dst);     // 메모리 재할당
 }
 
-/* 2진수, 16진수 string으로부터 bigint Set */
-msg bi_set_from_string(bigint** dst, char* int_str, int base) {
+/*
+ * 함수명: bi_set_from_string
+ * 함수인자: OUT bigint** dst, IN const char* int_str, IN int base
+ * 함수역할: base, string으로부터 bigint setting (2진수, 10진수, 16진수)
+ * 입력 문자열: 음수면 "-" 양수면 "" + "진수표현문자열"
+ */
+msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
 
     /* 문자열 NULL 체크 */
     if (int_str == NULL) {
@@ -47,21 +56,23 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
     }
 
     /* 부호값 처리 */
-    int sign = 0;
+    int sign = NON_NEGATIVE;
     if (int_str[0] == '-'){
-        sign = 1;
+        sign = NEGATIVE;
         int_str++;
     }
 
     /* 진수에 따른 문자열 유효성 검사 */
     int i = 0;
-    while (int_str[i] != '\0') {
+    while (int_str[i] != '\0') {                                // 문자열 끝까지
+        /* 2진수 */
         if (base == 2) {
             if (int_str[i] != '0' && int_str[i] != '1') {
                 fprintf(stderr, BinInputErrMsg);
                 return BinInputErr;
             }
         } 
+        /* 16진수 */
         else if (base == 16) {
             if (!((int_str[i] >= '0' && int_str[i] <= '9') || 
                 (int_str[i] >= 'a' && int_str[i] <= 'f') || 
@@ -70,6 +81,7 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
                 return HexInputErr;
             }
         }
+        /* 10진수 */
         else if (base == 10) {
             if (!(int_str[i] >= '0' && int_str[i] <= '9')) {
                 fprintf(stderr, DecInputErrMsg);
@@ -87,15 +99,15 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
     int str_len = strlen(int_str);
     int word_len;
 
-    // base에 따라 word_len 계산
+    /* base에 따라 word_len 계산 */
     if (base == 2) {
-        word_len = (str_len / BINARY_STRING_LENGTH) + (str_len % BINARY_STRING_LENGTH != 0);
+        word_len = (str_len / BINARY_STRING_LENGTH) + (str_len % BINARY_STRING_LENGTH != 0);    // Ceiling
     }
     else if (base == 16) {
-        word_len = (str_len / HEX_STRING_LENGTH) + (str_len % HEX_STRING_LENGTH != 0);
+        word_len = (str_len / HEX_STRING_LENGTH) + (str_len % HEX_STRING_LENGTH != 0);          // Ceiling
     }
     else if (base == 10) {
-
+        // 미완
     }
 
     /* bigint 초기화 */
@@ -105,40 +117,39 @@ msg bi_set_from_string(bigint** dst, char* int_str, int base) {
 
     /* 2진수 처리 */
     if (base == 2) {
-        int bit_pos = 0;
-        for (int i = str_len - 1; i >= 0; i--) {
-            if (int_str[i] == '1') {
-                (*dst)->a[bit_pos / 32] |= (1 << (bit_pos % 32));
+        int bit_pos = 0;                                            // 문자 하나씩
+        for (int i = str_len - 1; i >= 0; i--) {                    // 거꾸로 (문자열에서 LSB는 가장 우측이기 때문)
+            if (int_str[i] == '1') {                                // 1이면
+                (*dst)->a[bit_pos / WORD_BITLEN] |= (1 << (bit_pos % WORD_BITLEN));   // 해당 위치에 1 입력
             }
             bit_pos++;
         }
     }
     /* 16진수 처리 */
     else if (base == 16) {
-        int bit_pos = 0;
-        for (int i = str_len - 1; i >= 0; i--) {
-            char c = int_str[i];
-            int value = (c >= '0' && c <= '9') ? (c - '0') : 
-                        (c >= 'a' && c <= 'f') ? (c - 'a' + 10) : (c - 'A' + 10);
-            (*dst)->a[bit_pos / 32] |= value << (bit_pos % 32);
-            bit_pos += 4;  // 4비트씩 이동
+        int bit_pos = 0;                                            // 문자 하나씩
+        for (int i = str_len - 1; i >= 0; i--) {                    // 거꾸로
+            char c = int_str[i];                                    // 문자를 정수로 바꾸기 (0~9, a~f, A~F)
+            int value = (c >= '0' && c <= '9') ? (c - '0') :                        // "0"~"9"면 0~9로 변환, 아니면  
+                        (c >= 'a' && c <= 'f') ? (c - 'a' + 10) : (c - 'A' + 10);   // "a"~"f" 또는 "A"~"F"면 10~15로 변환
+            (*dst)->a[bit_pos / WORD_BITLEN] |= value << (bit_pos % WORD_BITLEN);   // 해당 위치에 0~15 입력
+            bit_pos += 4;  // 4비트씩 (문자 하나당 4비트이기 때문)
         }
     }
+    /* 10진수 처리(미완) */
     else if (base == 10) {
 
     }
 
-    return bi_refine(*dst);
+    return bi_refine(*dst);     // 메모리 재할당
 }
 
-/* 임의의 값으로 bigint 초기화 */
-/* 마지막 원소가 nonzero여야 함 */
-msg bi_get_random(OUT bigint** dst, IN int sign, IN int word_len) {
-    /* NULL 체크 */
-    if (*dst == NULL) {
-        fprintf(stderr, DSTpNULLErrMsg);
-        return DSTpNULLErr;
-    }
+/*
+ * 함수명: bi_get_random
+ * 함수인자: OUT bigint** dst, IN int word_len
+ * 함수역할: 임의의 값으로 word_len만큼 bigint 초기화
+ */
+msg bi_get_random(OUT bigint** dst, IN int word_len) {
 
     /* 워드 길이 체크 */
     if (word_len <= 0) {
@@ -146,27 +157,32 @@ msg bi_get_random(OUT bigint** dst, IN int sign, IN int word_len) {
         return WordLenErr;
     }
 
-    /* 워드 메모리 할당 */
-    (*dst)->a = (word*)calloc(word_len, sizeof(word));
-    if ((*dst)->a == NULL) {
-        fprintf(stderr, MemAllocErrMsg);
-        return MemAllocErr;
-    }
-    (*dst)->word_len = word_len;
+    /* bigint 초기화 */
+    bi_new(dst, word_len);
 
+    /* 부호값 임의의 값 설정 */
+    (*dst)->sign = byte_rand() % 2;
+
+    /* array word_len만큼 임의의 값 설정 */
     array_rand((*dst)->a, word_len);
-    return CLEAR;
+
+    return bi_refine(*dst);     // 메모리 재할당(마지막 원소가 0일 수도 있음)
 }
 
-/* 진수 출력 */
-msg bi_print(const bigint* dst, int base) {
+/*
+ * 함수명: bi_print
+ * 함수인자: IN const bigint* dst, IN int base
+ * 함수역할: bigint를 base에 맞게 출력 (2진수, 10진수, 16진수)
+ */
+msg bi_print(IN const bigint* dst, IN int base) {
+
     /* bigint NULL 체크 */
     if (dst == NULL || dst->word_len <= 0 || dst->a == NULL) {
         fprintf(stderr, DSTpNULLErrMsg);
         return DSTpNULLErr;
     }
 
-    /* 진수 체크 */
+    /* 진수값 체크 */
     if (base != 2 && base != 16) {
         fprintf(stderr, UnSupportBaseErrMsg);
         return UnSupportBaseErr;
@@ -174,28 +190,22 @@ msg bi_print(const bigint* dst, int base) {
 
     /* Bigint 출력 */
     printf("BigInt (base %d): ", base);
-    if (dst->sign == 1) {
+    if (dst->sign == NEGATIVE) {        // 부호값 (음의 부호 처리)
         printf("-");
     }
-
-    if (base == 16) {
-        printf("0x");
-        for (int i = dst->word_len - 1; i >= 0; i--) {
-            printf("%08X", dst->a[i]);  // 각 word를 16진수로 출력
-        }
-    }
-    // 2진수 출력
-    else if (base == 2) {
+    
+    /* 2진수 출력 */
+    if (base == 2) {
         printf("0b");
-        int leading_zero = 1;  // 처음의 0들을 건너뛰기 위한 플래그
-        for (int i = dst->word_len - 1; i >= 0; i--) {
-            for (int j = WORD_BIT - 1; j >= 0; j--) {
-                int bit = (dst->a[i] >> j) & 1;  // 해당 비트를 추출
-                if (bit == 1) {
-                    leading_zero = 0;  // 처음으로 1을 만나면 leading_zero 해제
+        int leading_zero = 1;                               // 처음의 0들을 건너뛰기 위한 플래그
+        for (int i = dst->word_len - 1; i >= 0; i--) {      // WORD 배열 인덱스를 역순으로
+            for (int j = WORD_BITLEN - 1; j >= 0; j--) {    // 각 WORD 내 비트를 역순으로
+                int bit = (dst->a[i] >> j) & 1;             // 해당 비트를 추출 (MSB부터)
+                if (bit == 1) {                             // 1이면
+                    leading_zero = 0;                       // leading_zero 해제
                 }
-                if (!leading_zero) {
-                    printf("%d", bit);
+                if (!leading_zero) {                        // leading_zero 해제된 이후로 계속
+                    printf("%d", bit);                      // 출력
                 }
             }
         }
@@ -204,14 +214,41 @@ msg bi_print(const bigint* dst, int base) {
             printf("0");
         }
     }
+    /* 16진수 출력 */
+    else if (base == 16) {
+        printf("0x"); 
+        int leading_zero = 1;                                // 처음의 0들을 건너뛰기 위한 플래그
+        for (int i = dst->word_len - 1; i >= 0; i--) {       // WORD 배열 인덱스를 역순으로
+            if (dst->a[i] != 0) {                            
+                if (leading_zero) {                          // leading_zero가 1인 경우
+                    printf("%X", dst->a[i]);                 // 패딩 없이 출력
+                    leading_zero = 0;                        // leading_zero 해제
+                } else {
+                    printf("%08X", dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
+                }
+            } else if (!leading_zero) {                      // leading_zero가 해제된 이후는
+                printf("%08X", dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
+            }
+        }
+
+        // 모든 비트가 0일 경우 0 출력
+        if (leading_zero) {
+            printf("0");
+        }
+    }
     printf("\n");
 
-    return 1;
+    return CLEAR;
 }
 
-/* 초기화 */
-msg bi_new(bigint** dst, int word_len) {
-    /* 메모리 해제 */
+/*
+ * 함수명: bi_new
+ * 함수인자: OUT bigint** dst, IN int word_len
+ * 함수역할: bigint를 word_len만큼 초기화
+ */
+msg bi_new(OUT bigint** dst, IN int word_len) {
+
+    /* NULL이 아니면 메모리 해제 */
     if (*dst != NULL){
         bi_delete(dst);
     }
@@ -230,7 +267,7 @@ msg bi_new(bigint** dst, int word_len) {
     }
 
     /* 초기화 */
-    (*dst)->sign = NON_NEGATIVE;
+    (*dst)->sign = NON_NEGATIVE;    // 음이 아닌 정수로 초기화
     (*dst)->word_len = word_len;
     (*dst)->a = (word*)calloc(word_len, sizeof(word));
     if ((*dst)->a == NULL) {
@@ -238,12 +275,17 @@ msg bi_new(bigint** dst, int word_len) {
         free(*dst);
         return MemAllocErr;
     }
+
     return CLEAR;
 }
 
-/* 메모리 해제 */
-msg bi_delete(bigint** dst) {
-    /* 메모리 해제 확인 */
+/*
+ * 함수명: bi_delete
+ * 함수인자: UPDATE bigint** dst
+ * 함수역할: bigint의 메모리를 해제
+ */
+msg bi_delete(UPDATE bigint** dst) {
+    /* 메모리 NULL 체크 */
 	if (*dst == NULL) {
 		return CLEAR;
 	}
@@ -262,9 +304,13 @@ msg bi_delete(bigint** dst) {
 	return CLEAR;
 }
 
-/* 메모리 재할당 */
-msg bi_refine(bigint* dst) {
-    /* bigint NULL 체크 */
+/*
+ * 함수명: bi_refine
+ * 함수인자: UPDATE bigint* dst
+ * 함수역할: bigint의 메모리를 재할당 (word_len 줄이는 용도)
+ */
+msg bi_refine(UPDATE bigint* dst) {
+    /* 메모리 NULL 체크 */
 	if (dst == NULL) {
 		fprintf(stderr, DSTpNULLErrMsg);
 		return DSTpNULLErr;
@@ -272,30 +318,49 @@ msg bi_refine(bigint* dst) {
 
     /* 새로운 워드 길이 계산 */
 	int new_word_len = dst->word_len;
-	while (new_word_len > 1 && dst->a[new_word_len - 1] == 0){
+	while (new_word_len > 1 && dst->a[new_word_len - 1] == 0){  // 마지막 원소부터 0이면 WORD_LEN 줄이기
 		new_word_len--;
 	}
 
     /* 메모리 재할당 */
-	if (new_word_len != dst->word_len){
-		word* new_a = (word*)realloc(dst->a, new_word_len * sizeof(word));
-		if (new_a == NULL){
+	if (new_word_len != dst->word_len){              // WORD_LEN이 다르면 재할당
+		dst->a = (word*)realloc(dst->a, new_word_len * sizeof(word));
+		if (dst->a == NULL){
 			fprintf(stderr, MemAllocErrMsg);
 			return(MemAllocErr);
 		}
-		dst->a = new_a;
 		dst->word_len = new_word_len;
 	}
+
+    if ((dst->word_len) == 1 && (dst->a[0] == 0x0)){ // WORD_LEN이 1이고 값이 0이면 부호는 음이 아닌 정수로
+        dst->sign = NON_NEGATIVE;
+    }
 
 	return CLEAR;
 } 
 
-/* 대입 */
-msg bi_assign(bigint** dst, bigint* src) {
-    /* Source 에러 체크 */
-    if (src == NULL || src->a == NULL || src->word_len <= 0) { 
+/*
+ * 함수명: bi_assign
+ * 함수인자: UPDATE bigint** dst, IN const bigint* src
+ * 함수역할: bigint* dst에 src를 복사(대입, *dst = src)
+ */
+msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
+    /* Source bigint NULL 체크 */
+    if (src == NULL) { 
+        fprintf(stderr, SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+
+    /* Source array NULL 체크 */
+    if (src->a == NULL) { 
         fprintf(stderr, SrcArrNULLErrMsg);
         return SrcArrNULLErr;
+    }
+
+    /* Source 워드 길이 체크 */
+    if (src->word_len <= 0) { 
+        fprintf(stderr, WordLenErrMsg);
+        return WordLenErr;
     }
 
     /* 일치 여부 체크 */
@@ -303,25 +368,13 @@ msg bi_assign(bigint** dst, bigint* src) {
 		return CLEAR;
 	}
 
-    /* bigint NULL이면 초기화 */
-	if (*dst == NULL) {
-        bi_new(dst, src->word_len);
-    }
+    /* bigint 초기화 */
+	bi_new(dst, src->word_len);
 
-    /* 대입 */
+    /* 복사 */
 	(*dst)->sign = src->sign;
 
-	if ((*dst)->a != NULL){
-		free((*dst)->a);
-	}
-
-	(*dst)->a = (word*)calloc(src->word_len, sizeof(word));
-	if ((*dst)->a == NULL){
-		fprintf(stderr, MemAllocErrMsg);
-		return MemAllocErr;
-	}
-
-    memcpy((*dst)->a, src->a, src->word_len * sizeof(word));
+	array_copy((*dst)->a, src->a, src->word_len);
 
 	return CLEAR;
 }

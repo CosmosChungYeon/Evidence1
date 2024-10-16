@@ -8,18 +8,26 @@
 #include "config.h"
 #include "bi_def.h"
 #include "msg.h"
+#include "test.h"
 
 #include "const.h"
 
 int main() {
     srand(time(NULL));
+    msg result;
+    result = test_bi_set_from_array();
+    result = test_bi_set_from_string();
+    result = test_bi_new();
+    result = test_bi_delete();
+    result = test_bi_gen_random();
+    result = test_bi_refine();
+    result = test_bi_assign();
 
-	bigint* A; // bigint 구조
+    bigint* A; // bigint 구조
     bigint* B = NULL;
     bigint* C = NULL;
     bigint* D = NULL;
     bigint* E = NULL;
-    msg result;
 
     // 1. bi_set_from_array
     word arr[] = {0x12345678, 0x9ABCDEF0};
@@ -29,7 +37,7 @@ int main() {
     bi_delete(&A);
 
     // 2. bi_set_from_string
-    result = bi_set_from_string(&B, "11234GG56789", 16);
+    result = bi_set_from_string(&B, "000000001123456789", 16);
     printf("bi_set_from_string result (16): %d\n", result);
     bi_print(B, 16);
     bi_delete(&B);
@@ -37,13 +45,13 @@ int main() {
     // 3. bi_set_from_string
     result = bi_set_from_string(&C, "-11A2B3C4D", 16);
     printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(C, 2);
+    bi_print(C, 16);
     bi_delete(&C);
 
     // 4. bi_get_random
-    result = bi_get_random(&D, 0, 2);
+    result = bi_get_random(&D, 2);
     printf("bi_get_random result: %d\n", result);
-    bi_print(D, 2);
+    bi_print(D, 16);
 
     // 5. bi_assign
     result = bi_assign(&E, D);
@@ -54,14 +62,13 @@ int main() {
 
     // 6. bi_refine
     result = bi_set_from_string(&E, "0000000000000000000000000000000000000000001111001010101", 2);
-    printf("%d\n", E->word_len);
-    bi_print(E, 2);
+    printf("word_len = %d\n", E->word_len);
+    bi_print(E, 16);
 
     // 7. bi_delete
     bi_delete(&E);
     if (E == NULL) {
         printf("bi_delete successful.\n");
     }
-
     return 0;
 }
