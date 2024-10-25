@@ -7,10 +7,14 @@
 #include "const.h"
 #include "array_func.h"
 
-/*
- * 함수명: bi_set_from_array
- * 함수인자: OUT bigint** dst, IN int sign, IN int word_len, IN const word* a
- * 함수역할: sign, word_len, array로부터 bigint setting
+/**
+ * @brief Sets a bigint from an array with a given sign and word length.
+ * 
+ * @param[out] dst Pointer to the destination bigint.
+ * @param[in] sign Sign of the bigint (positive or negative).
+ * @param[in] word_len Length of the array in words.
+ * @param[in] a Array to set bigint from.
+ * @return Status message indicating success or failure.
  */
 msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const word* a) {
 
@@ -41,11 +45,14 @@ msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const w
     return bi_refine(*dst);     // 메모리 재할당
 }
 
-/*
- * 함수명: bi_set_from_string
- * 함수인자: OUT bigint** dst, IN const char* int_str, IN int base
- * 함수역할: base, string으로부터 bigint setting (2진수, 10진수, 16진수)
- * 입력 문자열: 음수면 "-" 양수면 "" + "진수표현문자열"
+/**
+ * @brief Sets a bigint from a string in a specified base (binary, decimal, or hexadecimal).
+ * 
+ * @param[out] dst Pointer to the destination bigint.
+ * @param[in] int_str String representation of the integer.
+ * @param[in] base Numerical base of the string (2, 10, or 16).
+ * @note If the integer is negative, the string should start with "-"; otherwise, it should start with an empty sign.
+ * @return Status message indicating success or failure.
  */
 msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
 
@@ -144,10 +151,12 @@ msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
     return bi_refine(*dst);     // 메모리 재할당
 }
 
-/*
- * 함수명: bi_get_random
- * 함수인자: OUT bigint** dst, IN int word_len
- * 함수역할: 임의의 값으로 word_len만큼 bigint 초기화
+/**
+ * @brief Initializes a bigint with a specified word length using random values.
+ * 
+ * @param[out] dst Pointer to the destination bigint.
+ * @param[in] word_len Length of the bigint in words.
+ * @return Status message indicating success or failure.
  */
 msg bi_get_random(OUT bigint** dst, IN int word_len) {
 
@@ -169,10 +178,12 @@ msg bi_get_random(OUT bigint** dst, IN int word_len) {
     return bi_refine(*dst);     // 메모리 재할당(마지막 원소가 0일 수도 있음)
 }
 
-/*
- * 함수명: bi_print
- * 함수인자: IN const bigint* dst, IN int base
- * 함수역할: bigint를 base에 맞게 출력 (2진수, 10진수, 16진수)
+/**
+ * @brief Prints a bigint in a specified base (binary, decimal, or hexadecimal).
+ * 
+ * @param[in] dst Pointer to the bigint to print.
+ * @param[in] base Numerical base for output (2, 10, or 16).
+ * @return Status message indicating success or failure.
  */
 msg bi_print(IN const bigint* dst, IN int base) {
 
@@ -241,10 +252,12 @@ msg bi_print(IN const bigint* dst, IN int base) {
     return CLEAR;
 }
 
-/*
- * 함수명: bi_new
- * 함수인자: OUT bigint** dst, IN int word_len
- * 함수역할: bigint를 word_len만큼 초기화
+/**
+ * @brief Initializes a bigint with a specified word length.
+ * 
+ * @param[out] dst Pointer to the destination bigint.
+ * @param[in] word_len Length of the bigint in words.
+ * @return Status message indicating success or failure.
  */
 msg bi_new(OUT bigint** dst, IN int word_len) {
 
@@ -279,10 +292,11 @@ msg bi_new(OUT bigint** dst, IN int word_len) {
     return CLEAR;
 }
 
-/*
- * 함수명: bi_delete
- * 함수인자: UPDATE bigint** dst
- * 함수역할: bigint의 메모리를 해제
+/**
+ * @brief Frees the memory allocated for a bigint.
+ * 
+ * @param[in, out] dst Pointer to the bigint to delete.
+ * @return Status message indicating success or failure.
  */
 msg bi_delete(UPDATE bigint** dst) {
     /* 메모리 NULL 체크 */
@@ -304,10 +318,11 @@ msg bi_delete(UPDATE bigint** dst) {
 	return CLEAR;
 }
 
-/*
- * 함수명: bi_refine
- * 함수인자: UPDATE bigint* dst
- * 함수역할: bigint의 메모리를 재할당 (word_len 줄이는 용도)
+/**
+ * @brief Reallocates memory for a bigint, typically used to reduce its word length.
+ * 
+ * @param[in, out] dst Pointer to the bigint to refine.
+ * @return Status message indicating success or failure.
  */
 msg bi_refine(UPDATE bigint* dst) {
     /* 메모리 NULL 체크 */
@@ -339,10 +354,12 @@ msg bi_refine(UPDATE bigint* dst) {
 	return CLEAR;
 } 
 
-/*
- * 함수명: bi_assign
- * 함수인자: UPDATE bigint** dst, IN const bigint* src
- * 함수역할: bigint* dst에 src를 복사(대입, *dst = src)
+/**
+ * @brief Copies a bigint from src to dst.
+ * 
+ * @param[in, out] dst Pointer to the destination bigint.
+ * @param[in] src Pointer to the source bigint.
+ * @return Status message indicating success or failure.
  */
 msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
     /* Source bigint NULL 체크 */

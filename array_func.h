@@ -4,24 +4,31 @@
 #include "bi_def.h"
 #include "rand.h"
 
-/*
- * 함수명: array_init
- * 함수인자: UPDATE word* a, int IN word_len
- * 함수역할: array a 초기화
+/**
+ * @brief Initializes an array with zero values.
+ * 
+ * @param[out] a Array to be initialized.
+ * @param[in] word_len Length of the array in words.
+ * @return CLEAR if initialization is successful, otherwise NOTInitErr.
  */
 msg array_init(UPDATE word* a, int IN word_len);
 
-/*
- * 함수명: array_copy
- * 함수인자: OUT word* dst, IN word* src, IN int word_len
- * 함수역할: dst array에 src array 복사
+/**
+ * @brief Copies the source array to the destination array.
+ * 
+ * @param[out] dst Destination array.
+ * @param[in] src Source array to copy from.
+ * @param[in] word_len Length of the arrays in words.
+ * @return CLEAR if copy is successful, otherwise MemAllocErr.
  */
 msg array_copy(OUT word* dst, IN word* src, IN int word_len);
 
-/*
- * 함수명: array_rand
- * 함수인자: OUT word* dst, IN int word_len
- * 함수역할: dst array에 word_len만큼 임의의 값으로 할당
+/**
+ * @brief Fills the destination array with random values.
+ * 
+ * @param[out] dst Array to be filled with random values.
+ * @param[in] word_len Length of the array in words.
+ * @return CLEAR if random assignment is successful.
  */
 msg array_rand(OUT word* dst, IN int word_len);
 

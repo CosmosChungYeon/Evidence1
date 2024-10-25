@@ -37,7 +37,7 @@ int main() {
     bi_delete(&A);
 
     // 2. bi_set_from_string
-    result = bi_set_from_string(&B, "000000001123456789", 16);
+    result = bi_set_from_string(&B, "000000000123456789", 16);
     printf("bi_set_from_string result (16): %d\n", result);
     bi_print(B, 16);
     bi_delete(&B);
@@ -70,5 +70,7 @@ int main() {
     if (E == NULL) {
         printf("bi_delete successful.\n");
     }
+
+    system("leaks main.out > leaks_result_temp; cat leaks_result_temp | grep leaked && rm -rf leaks_result_temp");
     return 0;
 }
