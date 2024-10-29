@@ -395,3 +395,40 @@ msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
 
 	return CLEAR;
 }
+
+msg bi_compareABS(IN bigint** A, IN bigint** B) {
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+    if (n > m) {
+        return COMPARE_GREATER;
+    }
+    else if (n < m) {
+        return COMPARE_LESS;
+    }
+
+    for (int j = n - 1; j >= 0; j--){
+        if ((*A)->a[j] > (*B)->a[j]){
+            return COMPARE_GREATER;
+        }
+        else if ((*A)->a[j] < (*B)->a[j]) {
+            return COMPARE_LESS;
+        }
+    }
+    return COMPARE_EQUAL;
+}
+
+msg bi_compare(IN bigint** A, IN bigint** B) {
+    if (((*A)->sign == NON_NEGATIVE) && ((*B)->sign == NEGATIVE)) {
+        return COMPARE_GREATER;
+    }
+    if (((*A)->sign == NEGATIVE) && ((*B)->sign == NON_NEGATIVE)) {
+        return COMPARE_LESS;
+    }
+    msg ret = bi_compareABS(A, B);
+    if ((*A)->sign == NON_NEGATIVE) {
+        return ret;
+    }
+    else {
+        return ret * (-1); 
+    }
+}

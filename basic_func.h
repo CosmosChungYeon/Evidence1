@@ -78,4 +78,14 @@ msg bi_refine(UPDATE bigint* dst);
  */
 msg bi_assign(UPDATE bigint** dst, IN const bigint* src);
 
+/**
+ * 
+ */
+msg bi_compareABS(IN bigint** A, IN bigint** B);
+
+/**
+ * 
+ */
+msg bi_compare(IN bigint** A, IN bigint** B);
+
 #endif  // BASIC_FUNC_H

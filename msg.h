@@ -4,6 +4,11 @@
 /** @brief Status code indicating no issues. */
 #define CLEAR               1       // 문제 없음
 
+#define COMPARE_GREATER     1
+#define COMPARE_EQUAL       0
+#define COMPARE_LESS        -1
+
+
 /** @name CONFIG 관련 오류 */
 /**@{*/
 /** @brief Unsupported WORD_BITLEN value error. */

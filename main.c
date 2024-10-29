@@ -28,6 +28,15 @@ int main() {
     bigint* C = NULL;
     bigint* D = NULL;
     bigint* E = NULL;
+    
+    word A_arr[] = {0x12345678, 0x9ABCDEF0};
+    word B_arr[] = {0x12345678, 0xAABCDEF0};
+    result = bi_set_from_array(&A, 0, 2, A_arr);
+    result = bi_set_from_array(&B, 0, 2, B_arr);
+    result = bi_compare(&A, &B);
+    printf("compare_value: %d\n", result);
+    bi_delete(&A);
+    bi_delete(&B);
 
     // 1. bi_set_from_array
     word arr[] = {0x12345678, 0x9ABCDEF0};
@@ -65,12 +74,13 @@ int main() {
     printf("word_len = %d\n", E->word_len);
     bi_print(E, 16);
 
+
     // 7. bi_delete
     bi_delete(&E);
     if (E == NULL) {
         printf("bi_delete successful.\n");
     }
 
-    system("leaks main.out > leaks_result_temp; cat leaks_result_temp | grep leaked && rm -rf leaks_result_temp");
+
     return 0;
 }
