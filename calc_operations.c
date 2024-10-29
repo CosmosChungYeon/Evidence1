@@ -31,6 +31,7 @@ msg bi_sub_AbB(OUT word* C, IN word A, IN int b, IN word B) {
 msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int n = (*A)->word_len;
     int m = (*B)->word_len;
+    (*B)->word_len = n;
     memset(((*B)->a) + m, 0, WORD_ARR_BYTELEN(n - m));
 
     int b = 0;
@@ -38,6 +39,7 @@ msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B) {
         b = bi_sub_AbB(&((*C)->a[j]), (*A)->a[j], b, (*B)->a[j]);
     }
 
+    bi_refine(*B);
     return bi_refine(*C);
 }
 
