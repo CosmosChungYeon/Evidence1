@@ -13,6 +13,8 @@
                 "${fileDirname}/rand.c",
                 "${fileDirname}/basic_func.c",
                 "${fileDirname}/main.c",
+                "${fileDirname}/calc_operations.c",
+
                 "-o",
                 "${fileDirname}/main.exe"
             ],
@@ -45,6 +47,8 @@
                 "${fileDirname}/rand.c",
                 "${fileDirname}/basic_func.c",
                 "${fileDirname}/main.c",
+                "${fileDirname}/calc_operations.c",
+
                 "-o",
                 "${fileDirname}\\main.exe"
             ],

@@ -5,6 +5,7 @@
 #include <time.h>       // bi_gen_random
 
 #include "basic_func.h"
+#include "calc_operations.h"
 #include "config.h"
 #include "bi_def.h"
 #include "msg.h"
@@ -29,14 +30,20 @@ int main() {
     bigint* D = NULL;
     bigint* E = NULL;
     
-    word A_arr[] = {0x12345678, 0x9ABCDEF0};
-    word B_arr[] = {0x12345678, 0xAABCDEF0};
+    word A_arr[] = {0x12345679, 0x9ABCDEF0};
+    word B_arr[] = {0x12345678, 0x9ABCDEF0};
     result = bi_set_from_array(&A, 0, 2, A_arr);
     result = bi_set_from_array(&B, 0, 2, B_arr);
-    result = bi_compare(&A, &B);
-    printf("compare_value: %d\n", result);
+    result = bi_new(&C, 2);
+    //result = bi_compare(&A, &B);
+    //printf("compare_value: %d\n", result);
+
+    result = bi_subc(&C, &A, &B);
+    bi_print(C, 16);
+
     bi_delete(&A);
     bi_delete(&B);
+    bi_delete(&C);
 
     // 1. bi_set_from_array
     word arr[] = {0x12345678, 0x9ABCDEF0};
