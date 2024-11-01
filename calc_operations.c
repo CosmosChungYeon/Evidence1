@@ -15,7 +15,6 @@ msg bi_add_ABc(OUT word* C, IN word A, IN word B, IN int c) {
     c_out = (*C < c) ? c_out + 1 : c_out;   // if A + B + c < c, then c' += 1 
     
     return c_out;   // c' 반환
-
 }
 
 msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
