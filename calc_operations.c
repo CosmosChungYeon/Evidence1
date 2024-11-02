@@ -6,11 +6,34 @@
 #include "const.h"
 
 msg bi_add_ABc(OUT word* C, IN word A, IN word B, IN int c) {
+    
+    int c_out = 0;  // 반환용 carry(c')
+    *C = A + B;
+    c_out = (*C < A) ? 1 : 0;   // if A + B < A, then c' = 1
 
+    *C += c;
+    c_out = (*C < c) ? c_out + 1 : c_out;   // if A + B + c < c, then c' += 1 
+    
+    return c_out;   // c' 반환
+    
 }
 
 msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
 
+    // [n >= m]
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+    (*B)->word_len = n; // 자릿수 맞추기
+    memset(((*B)->a) + m, 0, WORD_ARR_BYTELEN(n - m));
+
+    int c = 0;
+    for (int j = 0; j < n; j++) {
+        c = bi_add_ABc(&((*C)->a[j]), (*A)->a[j], (*B)->a[j], c);   // 연산
+    }
+
+    bi_refine(*B);
+    return bi_refine(*C);
+    
 }
 
 msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B) {
