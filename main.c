@@ -31,7 +31,7 @@ int main() {
     bigint* E = NULL;
     
     word A_arr[] = {0x12345678, 0x9ABCDEF0, 0x12345678};
-    word B_arr[] = {0x12345678, 0x9ABCDEF0};
+    word B_arr[] = {0x12345679, 0x9ABCDEF1};
     result = bi_set_from_array(&A, 0, 3, A_arr);
     result = bi_set_from_array(&B, 0, 2, B_arr);
     result = bi_new(&C, 3);
@@ -40,6 +40,9 @@ int main() {
 
     result = bi_subc(&C, &A, &B);
     bi_print(C, 16);
+    printf("A's word_len = %d\n", A->word_len);
+    printf("B's word_len = %d\n", B->word_len);
+    printf("C's word_len = %d\n", C->word_len);
 
     bi_delete(&A);
     bi_delete(&B);

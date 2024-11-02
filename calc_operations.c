@@ -3,7 +3,7 @@
 #include "basic_func.h"
 #include "config.h"
 #include "bi_def.h"
-
+#include "const.h"
 
 msg bi_add_ABc(OUT word* C, IN word A, IN word B, IN int c) {
 
@@ -21,7 +21,7 @@ msg bi_sub_AbB(OUT word* C, IN word A, IN int b, IN word B) {
     int b_out = 0;
     *C = A - b;
 
-    b_out = (A < b) ? 1 : 0;
+    b_out = (A < b) ? BORROW1 : BORROW0;
     b_out = (*C < B) ? b_out + 1 : b_out;
     *C = *C - B;
 

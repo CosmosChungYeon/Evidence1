@@ -7,4 +7,10 @@
 /** @brief Constant representing a negative integer. */
 #define NEGATIVE 	 1	// 음수
 
+#define CARRY1       1
+#define CARRY0       0
+
+#define BORROW1      1
+#define BORROW0      0
+
 #endif  // CONST_H
