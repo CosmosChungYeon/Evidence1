@@ -7,15 +7,6 @@
 #include "const.h"
 #include "array_func.h"
 
-/**
- * @brief Sets a bigint from an array with a given sign and word length.
- * 
- * @param[out] dst Pointer to the destination bigint.
- * @param[in] sign Sign of the bigint (positive or negative).
- * @param[in] word_len Length of the array in words.
- * @param[in] a Array to set bigint from.
- * @return Status message indicating success or failure.
- */
 msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const word* a) {
 
     /* 부호값 체크 */
@@ -45,15 +36,6 @@ msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const w
     return bi_refine(*dst);     // 메모리 재할당
 }
 
-/**
- * @brief Sets a bigint from a string in a specified base (binary, decimal, or hexadecimal).
- * 
- * @param[out] dst Pointer to the destination bigint.
- * @param[in] int_str String representation of the integer.
- * @param[in] base Numerical base of the string (2, 10, or 16).
- * @note If the integer is negative, the string should start with "-"; otherwise, it should start with an empty sign.
- * @return Status message indicating success or failure.
- */
 msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
 
     /* 문자열 NULL 체크 */
@@ -151,13 +133,6 @@ msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
     return bi_refine(*dst);     // 메모리 재할당
 }
 
-/**
- * @brief Initializes a bigint with a specified word length using random values.
- * 
- * @param[out] dst Pointer to the destination bigint.
- * @param[in] word_len Length of the bigint in words.
- * @return Status message indicating success or failure.
- */
 msg bi_get_random(OUT bigint** dst, IN int word_len) {
 
     /* 워드 길이 체크 */
@@ -178,13 +153,6 @@ msg bi_get_random(OUT bigint** dst, IN int word_len) {
     return bi_refine(*dst);     // 메모리 재할당(마지막 원소가 0일 수도 있음)
 }
 
-/**
- * @brief Prints a bigint in a specified base (binary, decimal, or hexadecimal).
- * 
- * @param[in] dst Pointer to the bigint to print.
- * @param[in] base Numerical base for output (2, 10, or 16).
- * @return Status message indicating success or failure.
- */
 msg bi_print(IN const bigint* dst, IN int base) {
 
     /* bigint NULL 체크 */
@@ -200,7 +168,6 @@ msg bi_print(IN const bigint* dst, IN int base) {
     }
 
     /* Bigint 출력 */
-    printf("BigInt (base %d): ", base);
     if (dst->sign == NEGATIVE) {        // 부호값 (음의 부호 처리)
         printf("-");
     }
@@ -232,13 +199,13 @@ msg bi_print(IN const bigint* dst, IN int base) {
         for (int i = dst->word_len - 1; i >= 0; i--) {       // WORD 배열 인덱스를 역순으로
             if (dst->a[i] != 0) {                            
                 if (leading_zero) {                          // leading_zero가 1인 경우
-                    printf("%X", dst->a[i]);                 // 패딩 없이 출력
+                    printf("%x", dst->a[i]);                 // 패딩 없이 출력
                     leading_zero = 0;                        // leading_zero 해제
                 } else {
-                    printf("%08X", dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
+                    printf("%08x", dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
                 }
             } else if (!leading_zero) {                      // leading_zero가 해제된 이후는
-                printf("%08X", dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
+                printf("%08x", dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
             }
         }
 
@@ -247,18 +214,9 @@ msg bi_print(IN const bigint* dst, IN int base) {
             printf("0");
         }
     }
-    printf("\n");
-
     return CLEAR;
 }
 
-/**
- * @brief Initializes a bigint with a specified word length.
- * 
- * @param[out] dst Pointer to the destination bigint.
- * @param[in] word_len Length of the bigint in words.
- * @return Status message indicating success or failure.
- */
 msg bi_new(OUT bigint** dst, IN int word_len) {
 
     /* NULL이 아니면 메모리 해제 */
@@ -292,38 +250,30 @@ msg bi_new(OUT bigint** dst, IN int word_len) {
     return CLEAR;
 }
 
-/**
- * @brief Frees the memory allocated for a bigint.
- * 
- * @param[in, out] dst Pointer to the bigint to delete.
- * @return Status message indicating success or failure.
- */
 msg bi_delete(UPDATE bigint** dst) {
     /* 메모리 NULL 체크 */
 	if (*dst == NULL) {
 		return CLEAR;
 	}
 
+    array_init((*dst)->a, (*dst)->word_len);
+    
     /* 비밀값 제거 */
 	(*dst)->sign = NON_NEGATIVE;
 	(*dst)->word_len = 0;
-
-    array_init((*dst)->a, (*dst)->word_len);
 
     /* 메모리 해제 */
     free((*dst)->a);
 	free(*dst);
 	*dst = NULL;
 
+    if (*dst != NULL) {
+        return printf("NO!");
+    }
+
 	return CLEAR;
 }
 
-/**
- * @brief Reallocates memory for a bigint, typically used to reduce its word length.
- * 
- * @param[in, out] dst Pointer to the bigint to refine.
- * @return Status message indicating success or failure.
- */
 msg bi_refine(UPDATE bigint* dst) {
     /* 메모리 NULL 체크 */
 	if (dst == NULL) {
@@ -354,13 +304,6 @@ msg bi_refine(UPDATE bigint* dst) {
 	return CLEAR;
 } 
 
-/**
- * @brief Copies a bigint from src to dst.
- * 
- * @param[in, out] dst Pointer to the destination bigint.
- * @param[in] src Pointer to the source bigint.
- * @return Status message indicating success or failure.
- */
 msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
     /* Source bigint NULL 체크 */
     if (src == NULL) { 
@@ -399,6 +342,8 @@ msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
 msg bi_compareABS(IN bigint** A, IN bigint** B) {
     int n = (*A)->word_len;
     int m = (*B)->word_len;
+
+    /* 배열 길이 비교 */
     if (n > m) {
         return COMPARE_GREATER;
     }
@@ -406,6 +351,7 @@ msg bi_compareABS(IN bigint** A, IN bigint** B) {
         return COMPARE_LESS;
     }
 
+    /* MSB에서 LSB까지 각 배열 값 비교 */
     for (int j = n - 1; j >= 0; j--){
         if ((*A)->a[j] > (*B)->a[j]){
             return COMPARE_GREATER;
@@ -414,17 +360,24 @@ msg bi_compareABS(IN bigint** A, IN bigint** B) {
             return COMPARE_LESS;
         }
     }
+
+    /* 배열이 같음 */
     return COMPARE_EQUAL;
 }
 
 msg bi_compare(IN bigint** A, IN bigint** B) {
+    /* 부호 비교 */
     if (((*A)->sign == NON_NEGATIVE) && ((*B)->sign == NEGATIVE)) {
         return COMPARE_GREATER;
     }
     if (((*A)->sign == NEGATIVE) && ((*B)->sign == NON_NEGATIVE)) {
         return COMPARE_LESS;
     }
+
+    /* 절댓값 비교 */
     msg ret = bi_compareABS(A, B);
+    
+    /* 부호에 따라 결과 조정 */
     if ((*A)->sign == NON_NEGATIVE) {
         return ret;
     }

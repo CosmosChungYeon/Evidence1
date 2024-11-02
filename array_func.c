@@ -3,13 +3,6 @@
 #include "array_func.h"
 #include "msg.h"
 
-/**
- * @brief Initializes an array with zero values.
- * 
- * @param[out] a Array to be initialized.
- * @param[in] word_len Length of the array in words.
- * @return CLEAR if initialization is successful, otherwise NOTInitErr.
- */
 msg array_init(UPDATE word* a, int IN word_len) {
     memset(a, 0, WORD_ARR_BYTELEN(word_len));   // array a의 길이만큼 0으로 초기화 (바이트단위)
     word result = 0;                            // 초기화 확인
@@ -25,14 +18,7 @@ msg array_init(UPDATE word* a, int IN word_len) {
     }
 }
 
-/**
- * @brief Copies the source array to the destination array.
- * 
- * @param[out] dst Destination array.
- * @param[in] src Source array to copy from.
- * @param[in] word_len Length of the arrays in words.
- * @return CLEAR if copy is successful, otherwise MemAllocErr.
- */
+
 msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
     if (dst != NULL){                           // NULL이 아니면 메모리 해제
 		free(dst);
@@ -48,13 +34,6 @@ msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
     return CLEAR;
 }
 
-/**
- * @brief Fills the destination array with random values.
- * 
- * @param[out] dst Array to be filled with random values.
- * @param[in] word_len Length of the array in words.
- * @return CLEAR if random assignment is successful.
- */
 msg array_rand(OUT word* dst, IN int word_len) {
     byte* p = (byte*)dst;                           // dst 포인터주소를 byte type으로 변경
     int cnt = WORD_ARR_BYTELEN(word_len);           // 배열의 바이트 길이

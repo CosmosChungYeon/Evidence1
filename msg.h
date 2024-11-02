@@ -1,59 +1,57 @@
 #ifndef MSG_H
 #define MSG_H
 
-/** @brief Status code indicating no issues. */
 #define CLEAR               1       // 문제 없음
 
 #define COMPARE_GREATER     1
 #define COMPARE_EQUAL       0
 #define COMPARE_LESS        -1
 
-
 /** @name CONFIG 관련 오류 */
 /**@{*/
-/** @brief Unsupported WORD_BITLEN value error. */
+/** @brief 지원하지 않는 WORD_BITLEN 오류  */
 #define UnSupportWordBitLenErr  0x0010  // 16: 지원하지 않는 WORD_BITLEN 오류
-/** @brief Unsupported USE_DRBG value error. */
+/** @brief 지원하지 않는 USE_DRBG 값 오류 */
 #define UnSupportUseDRBGValErr  0x0011  // 17: 지원하지 않는 USE_DRBG 값 오류
 /**@}*/
 
 /** @name 메모리 관련 오류 */
 /**@{*/
-/** @brief Memory allocation failure. */
+/** @brief 메모리 할당 오류 */
 #define MemAllocErr             0x0100   // 256: 메모리 할당 오류
-/** @brief Source bigint is NULL. */
+/** @brief Source bigint NULL 오류 */
 #define SrcNULLErr              0x0101   // 257: Source bigint NULL 오류
-/** @brief Source array or bigint array is NULL. */
+/** @brief Source array or bigint array NULL 오류 */
 #define SrcArrNULLErr           0x0102   // 258: Source array or bigint array NULL 오류
-/** @brief Destination bigint is NULL. */
+/** @brief Destination bigint NULL 오류 */
 #define DSTpNULLErr             0x0103   // 259: Destination bigint NULL 오류
 /**@}*/
 
 /** @name BIGINT SET 입력 관련 오류 */
 /**@{*/
-/** @brief Invalid sign value error. */
+/** @brief 부호값 오류 */
 #define SignValErr              0x0200   // 512: 부호값 오류
-/** @brief Invalid word length error. */
+/** @brief 워드 길이 오류 */
 #define WordLenErr              0x0201   // 513: 워드 길이 오류
-/** @brief NULL string error. */
+/** @brief 문자열 NULL 오류 */
 #define StrNULLErr              0x0202   // 514: 문자열 NULL 오류
 /**@}*/
 
 /** @name BASE 입력 관련 오류 */
 /**@{*/
-/** @brief Unsupported base error. */
+/** @brief 지원하지 않는 Base 오류 */
 #define UnSupportBaseErr        0x0300   // 768: 지원하지 않는 Base 오류
-/** @brief Invalid binary input error. */
+/** @brief 2진수 입력 유효성 오류 */
 #define BinInputErr             0x0301   // 769: 2진수 입력 유효성 오류
-/** @brief Invalid decimal input error. */
+/** @brief 10진수 입력 유효성 오류 */
 #define DecInputErr             0x0302   // 770: 10진수 입력 유효성 오류
-/** @brief Invalid hexadecimal input error. */
+/** @brief 16진수 입력 유효성 오류 */
 #define HexInputErr             0x0303   // 771: 16진수 입력 유효성 오류
 /**@}*/
 
 /** @name 초기화 관련 오류 */
 /**@{*/
-/** @brief Initialization failure error. */
+/** @brief 초기화 실패 오류 */
 #define NOTInitErr              0x0400   // 1024: 초기화 실패 오류
 /**@}*/
 

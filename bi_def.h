@@ -5,10 +5,9 @@
 
 /**
  * @struct bigint
- * @brief Structure representing a big integer.
+ * @brief 큰 정수를 나타내는 구조체
  * 
- * This structure holds information about the sign, word length, and word array 
- * for a large integer.
+ * 큰 정수에 대한 부호, 배열 길이, 배열에 대한 정보 저장
  */
 typedef struct {
 	int sign;		// 부호값
@@ -16,19 +15,8 @@ typedef struct {
 	word* a;		// 워드 배열
 } bigint;
 
-/** @def OUT
- *  @brief Macro indicating output parameter.
- */
 #define OUT			// OUTPUT
-
-/** @def IN
- *  @brief Macro indicating input parameter.
- */
 #define IN			// INPUT
-
-/** @def UPDATE
- *  @brief Macro indicating update parameter.
- */
 #define UPDATE		// UPDATE
 
 #endif  // BI_DEF_H

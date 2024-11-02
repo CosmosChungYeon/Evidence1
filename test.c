@@ -1,80 +1,79 @@
 #include "test.h"
+#include "basic_func.h"
+#include "calc_operations.h"
 
-/*
-	bigint* A; // bigint 구조
-    bigint* B = NULL;
-    bigint* C = NULL;
-    bigint* D = NULL;
-    bigint* E = NULL;
-    msg result;
+msg test_bi_add(int test_num) {
+    for (int i = 0; i < test_num; i++) {
+        bigint* A = NULL;
+        bigint* B = NULL;
+        bigint* C = NULL;
+        msg result;
 
-    // 1. bi_set_from_array
-    word arr[] = {0x12345678, 0x9ABCDEF0};
-    result = bi_set_from_array(&A, 0, 2, arr);
-    printf("bi_set_from_array result: %d\n", result);
-    bi_print(A, 16);
-    bi_delete(&A);
+        result = bi_get_random(&A, 31);
+        result = bi_get_random(&B, 30);
+        result = bi_get_random(&C, 31);
+        A->sign = 0;
+        B->sign = 0;
+        C->sign = 0;
+        printf("a = ");
+        bi_print(A, 16);
+        printf("\n");
+        printf("b = ");
+        bi_print(B, 16);
+        printf("\n");
+        bi_addc(&C, &A, &B);
+        bi_delete(&A);
+        bi_delete(&B);
+        printf("c = a + b\n");
+        printf("if (c != ");
+        bi_print(C, 16);
+        printf("):\n");
+        printf("    print('a = ', hex(a))\n");
+        printf("    print('b = ', hex(b))\n") ;
+        printf("    print('c = ', c)\n");
+        printf("    print('wrong answer = ',");
+        bi_print(C, 16);
+        printf(")\n");
 
-    // 2. bi_set_from_string
-    result = bi_set_from_string(&B, "1123456789", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(B, 16);
-    bi_delete(&B);
-
-    // 3. bi_set_from_string
-    result = bi_set_from_string(&C, "-11A2B3C4D", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(C, 2);
-    bi_delete(&C);
-
-    // 4. bi_get_random
-    result = bi_get_random(&D, 0, 2);
-    printf("bi_get_random result: %d\n", result);
-    bi_print(D, 2);
-
-    // 5. bi_assign
-    result = bi_assign(&E, D);
-    printf("bi_assign result: %d\n", result);
-    printf("Copied bigint:\n");
-    bi_print(E, 2);
-    bi_delete(&E);
-
-    // 6. bi_refine
-    result = bi_set_from_string(&E, "0000000000000000000000000000000000000000001111001010101", 2);
-    printf("word_len = %d\n", E->word_len);
-    bi_print(E, 2);
-
-    // 7. bi_delete
-    bi_delete(&E);
-    if (E == NULL) {
-        printf("bi_delete successful.\n");
+        bi_delete(&C);
     }
-*/
-
-msg test_bi_set_from_array() {
-
+    return CLEAR;
 }
 
-msg test_bi_set_from_string() {
+msg test_bi_sub(int test_num) {
+    for (int i = 0; i < test_num; i++) {
+        bigint* A = NULL;
+        bigint* B = NULL;
+        bigint* C = NULL;
+        msg result;
 
-}
+        result = bi_get_random(&A, 31);
+        result = bi_get_random(&B, 30);
+        result = bi_get_random(&C, 31);
+        A->sign = 0;
+        B->sign = 0;
+        C->sign = 0;
+        printf("a = ");
+        bi_print(A, 16);
+        printf("\n");
+        printf("b = ");
+        bi_print(B, 16);
+        printf("\n");
+        bi_subc(&C, &A, &B);
+        bi_delete(&A);
+        bi_delete(&B);
+        printf("c = a - b\n");
+        printf("if (c != ");
+        bi_print(C, 16);
+        printf("):\n");
+        printf("    print('a = ', hex(a))\n");
+        printf("    print('b = ', hex(b))\n") ;
+        printf("    print('c = ', c)\n");
+        printf("    print('wrong answer = ',");
+        bi_print(C, 16);
+        printf(")\n");
 
-msg test_bi_new() {
-
-}
-
-msg test_bi_delete() {
-
-}
-
-msg test_bi_gen_random() {
-
-}
-
-msg test_bi_refine() {
-
-}
-
-msg test_bi_assign() {
-    
+        bi_delete(&C);
+    }
+    return CLEAR;
 }
