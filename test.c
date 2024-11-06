@@ -9,8 +9,8 @@ msg test_bi_add(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, 32);
-        result = bi_get_random(&B, 32);
+        result = bi_get_random(&A, TEST_WORD_LEN);
+        result = bi_get_random(&B, TEST_WORD_LEN);
 
         printf("a = ");
         bi_print(A, 16);
@@ -44,8 +44,8 @@ msg test_bi_sub(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, 32);
-        result = bi_get_random(&B, 32);
+        result = bi_get_random(&A, TEST_WORD_LEN);
+        result = bi_get_random(&B, TEST_WORD_LEN);
 
         printf("a = ");
         bi_print(A, 16);

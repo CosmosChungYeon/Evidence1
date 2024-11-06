@@ -199,13 +199,13 @@ msg bi_print(IN const bigint* dst, IN int base) {
         for (int i = dst->word_len - 1; i >= 0; i--) {       // WORD 배열 인덱스를 역순으로
             if (dst->a[i] != 0) {                            
                 if (leading_zero) {                          // leading_zero가 1인 경우
-                    printf("%x", dst->a[i]);                 // 패딩 없이 출력
+                    printf(FORMAT, dst->a[i]);                 // 패딩 없이 출력
                     leading_zero = 0;                        // leading_zero 해제
                 } else {
-                    printf("%08x", dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
+                    printf(FORMAT, dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
                 }
             } else if (!leading_zero) {                      // leading_zero가 해제된 이후는
-                printf("%08x", dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
+                printf(FORMAT, dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
             }
         }
 
