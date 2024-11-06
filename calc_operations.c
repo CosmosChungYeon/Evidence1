@@ -30,6 +30,9 @@ msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     for (int j = 0; j < n; j++) {
         c = bi_add_ABc(&((*C)->a[j]), (*A)->a[j], (*B)->a[j], c);
     }
+    if (c == CARRY1) {
+        (*C)->a[n] = CARRY1;
+    }
 
     /* B 배열 원래대로 */
     bi_refine(*B);
@@ -38,7 +41,51 @@ msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
 }
 
 msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B) {
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+    int max_word_len = (n > m) ? n + 1 : m + 1;
+    bi_new(C, max_word_len);
+
+    if (*A == NULL) {
+        printf("%s", SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+    if (*B == NULL) {
+        printf("%s", SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+
+    // A > 0 and B < 0 
+    if ((*A)->sign == NON_NEGATIVE && (*B)->sign == NEGATIVE) {
+        (*B)->sign = NON_NEGATIVE;
+        msg result = bi_sub(C, A, B);
+        (*B)->sign = NEGATIVE;
+        return result;
+    }
+
+    // A < 0 and B > 0 
+    if ((*A)->sign == NEGATIVE && (*B)->sign == NON_NEGATIVE) {
+        (*A)->sign = NON_NEGATIVE;
+        msg result = bi_sub(C, B, A);
+        (*A)->sign = NEGATIVE;
+        return result;        
+    }
+
+    // A < 0 and B < 0
+    if (((*A)->sign && (*B)->sign) == NEGATIVE) {
+        (*C)->sign = NEGATIVE;
+    }
+
+    // wordlen A >= wordlen B
+    if ((*A)->word_len >= (*B)->word_len) {
+        return bi_addc(C, A, B);  
+    }
+    else {
+        return bi_addc(C, B, A);
+    }
     
+    return bi_refine(*C);
+
 }
 
 msg bi_sub_AbB(OUT word* C, IN word A, IN int b, IN word B) {
@@ -73,5 +120,63 @@ msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B) {
 }
 
 msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+    int max_word_len = (n > m) ? n + 1 : m + 1;
+    bi_new(C, max_word_len);
+
+    if (*A == NULL) {
+        printf("%s", SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+    if (*B == NULL) {
+        printf("%s", SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+
+    // A > 0, B > 0인 경우
+    if ((*A)->sign == NON_NEGATIVE && (*B)->sign == NON_NEGATIVE) {
+        if (bi_compare(A, B) == COMPARE_GREATER) {
+            return bi_subc(C, A, B);  // A > B일 때 C = A - B
+        }
+        else {
+            // A < B인 경우 C = B - A, 결과 부호는 음수로 설정
+            msg result = bi_subc(C, B, A);
+            (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+            return result;
+        }
+    }
+
+    // A < 0, B < 0인 경우
+    if ((*A)->sign == NEGATIVE && (*B)->sign == NEGATIVE) {
+        if (bi_compare(A, B) == COMPARE_GREATER) {
+            // A > B일 경우 C = B - A, 결과 부호는 양수로 설정
+            return bi_subc(C, B, A);
+        }
+        else {
+            // A < B일 경우 C = A - B, 결과 부호는 음수로 설정
+            msg result = bi_subc(C, A, B);
+            (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+            return result;
+        }
+    }
+
+    // A > 0, B < 0인 경우 (A - (-B) = A + B)
+    if ((*A)->sign == NON_NEGATIVE && (*B)->sign == NEGATIVE) {
+        (*B)->sign = NON_NEGATIVE;  // B를 양수로 변경
+        msg result = bi_add(C, A, B);  // C = A + B
+        (*B)->sign = NEGATIVE;  // B의 부호를 원래대로 복원
+        return result;
+    }
+
+    // A < 0, B > 0인 경우 (-A - B = -(A + B))
+    if ((*A)->sign == NEGATIVE && (*B)->sign == NON_NEGATIVE) {
+        (*A)->sign = NON_NEGATIVE;  // A를 양수로 변경
+        msg result = bi_add(C, A, B);  // C = A + B
+        (*A)->sign = NEGATIVE;  // A의 부호를 원래대로 복원
+        (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+        return result;
+    }
+    return bi_refine(*C);
 
 }

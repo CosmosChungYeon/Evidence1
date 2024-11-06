@@ -143,7 +143,7 @@ msg bi_get_random(OUT bigint** dst, IN int word_len) {
 
     /* bigint 초기화 */
     bi_new(dst, word_len);
-
+    
     /* 부호값 임의의 값 설정 */
     (*dst)->sign = byte_rand() % 2;
 

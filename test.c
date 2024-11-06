@@ -9,19 +9,16 @@ msg test_bi_add(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, 31);
-        result = bi_get_random(&B, 30);
-        result = bi_get_random(&C, 31);
-        A->sign = 0;
-        B->sign = 0;
-        C->sign = 0;
+        result = bi_get_random(&A, 32);
+        result = bi_get_random(&B, 32);
+
         printf("a = ");
         bi_print(A, 16);
         printf("\n");
         printf("b = ");
         bi_print(B, 16);
         printf("\n");
-        bi_addc(&C, &A, &B);
+        bi_add(&C, &A, &B);
         bi_delete(&A);
         bi_delete(&B);
         printf("c = a + b\n");
@@ -30,10 +27,10 @@ msg test_bi_add(int test_num) {
         printf("):\n");
         printf("    print('a = ', hex(a))\n");
         printf("    print('b = ', hex(b))\n") ;
-        printf("    print('c = ', c)\n");
-        printf("    print('wrong answer = ',");
+        printf("    print('c = ', hex(c))\n");
+        printf("    print('wrong answer = ', hex(");
         bi_print(C, 16);
-        printf(")\n");
+        printf("))\n");
 
         bi_delete(&C);
     }
@@ -47,19 +44,16 @@ msg test_bi_sub(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, 31);
-        result = bi_get_random(&B, 30);
-        result = bi_get_random(&C, 31);
-        A->sign = 0;
-        B->sign = 0;
-        C->sign = 0;
+        result = bi_get_random(&A, 32);
+        result = bi_get_random(&B, 32);
+
         printf("a = ");
         bi_print(A, 16);
         printf("\n");
         printf("b = ");
         bi_print(B, 16);
         printf("\n");
-        bi_subc(&C, &A, &B);
+        bi_sub(&C, &A, &B);
         bi_delete(&A);
         bi_delete(&B);
         printf("c = a - b\n");
@@ -68,10 +62,10 @@ msg test_bi_sub(int test_num) {
         printf("):\n");
         printf("    print('a = ', hex(a))\n");
         printf("    print('b = ', hex(b))\n") ;
-        printf("    print('c = ', c)\n");
-        printf("    print('wrong answer = ',");
+        printf("    print('c = ', hex(c))\n");
+        printf("    print('wrong answer = ', hex(");
         bi_print(C, 16);
-        printf(")\n");
+        printf("))\n");
 
         bi_delete(&C);
     }

@@ -15,10 +15,17 @@
 
 int main() {
     srand(time(NULL));
+
+    bigint* A = NULL;
+    bigint* B = NULL;
+    bigint* C = NULL;
     msg result;
-
+    
     result = test_bi_add(10);
-    result = test_bi_sub(10);
+    printf("%d\n", result);
 
+    result = test_bi_sub(10);
+    printf("%d\n", result);
+    
     return 0;
 }
