@@ -21,11 +21,18 @@ int main() {
     bigint* C = NULL;
     msg result;
     
-    result = test_bi_add(10);
+    //result = test_bi_add(10);
+    //printf("%d\n", result);
+
+    //result = test_bi_sub(10);
+    //printf("%d\n", result);
+
+    result = test_bi_textbook_mulc(10);
     printf("%d\n", result);
 
-    result = test_bi_sub(10);
-    printf("%d\n", result);
-    
+    bi_delete(&A);
+    bi_delete(&B);
+    bi_delete(&C);
+
     return 0;
 }

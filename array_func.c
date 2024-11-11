@@ -20,15 +20,15 @@ msg array_init(UPDATE word* a, int IN word_len) {
 
 
 msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
-    if (dst != NULL){                           // NULL이 아니면 메모리 해제
-		free(dst);
-	}
+    //if (dst != NULL){                           // NULL이 아니면 메모리 해제
+	//	free(dst);
+	//}
 
-	dst = (word*)calloc(word_len, sizeof(word));    // src의 word_len만큼 메모리 할당
-	if (dst == NULL){
-		fprintf(stderr, MemAllocErrMsg);
-		return MemAllocErr;
-	}
+    //dst = (word*)calloc(word_len, sizeof(word));    // src의 word_len만큼 메모리 할당
+	//if (dst == NULL){
+	//	fprintf(stderr, MemAllocErrMsg);
+	//	return MemAllocErr;
+	//}
 
     memcpy(dst, src, WORD_ARR_BYTELEN(word_len));      // src배열을 dst배열에 복사 (바이트 단위)
     return CLEAR;

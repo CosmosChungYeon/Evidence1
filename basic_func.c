@@ -86,7 +86,7 @@ msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base) {
 
     /* 문자열 -> 정수 */
     int str_len = strlen(int_str);
-    int word_len;
+    int word_len = 1;
 
     /* base에 따라 word_len 계산 */
     if (base == 2) {
@@ -255,15 +255,16 @@ msg bi_delete(UPDATE bigint** dst) {
 	if (*dst == NULL) {
 		return CLEAR;
 	}
-
-    array_init((*dst)->a, (*dst)->word_len);
     
+    array_init((*dst)->a, (*dst)->word_len);
+
     /* 비밀값 제거 */
 	(*dst)->sign = NON_NEGATIVE;
 	(*dst)->word_len = 0;
 
     /* 메모리 해제 */
     free((*dst)->a);
+
 	free(*dst);
 	*dst = NULL;
 
@@ -290,7 +291,7 @@ msg bi_refine(UPDATE bigint* dst) {
     /* 메모리 재할당 */
 	if (new_word_len != dst->word_len){              // WORD_LEN이 다르면 재할당
 		dst->a = (word*)realloc(dst->a, new_word_len * sizeof(word));
-		if (dst->a == NULL){
+        if (dst->a == NULL){
 			fprintf(stderr, MemAllocErrMsg);
 			return(MemAllocErr);
 		}
@@ -329,6 +330,7 @@ msg bi_assign(UPDATE bigint** dst, IN const bigint* src) {
 	}
 
     /* bigint 초기화 */
+    bi_delete(dst);
 	bi_new(dst, src->word_len);
 
     /* 복사 */
@@ -384,4 +386,29 @@ msg bi_compare(IN bigint** A, IN bigint** B) {
     else {
         return ret * (-1); 
     }
+}
+
+msg bi_shift_left(UPDATE bigint** T, IN int shift_words) {
+    /* 원본 길이와 shift 후 길이 설정 */
+    int original_len = (*T)->word_len;
+    int new_len = original_len + shift_words;
+    
+    /* word_len 업데이트 */
+    (*T)->word_len = new_len;
+
+    /* (*T)->a 배열 확장 */
+    word* word_temp = (word*)realloc((*T)->a, new_len * sizeof(word));
+    if (word_temp == NULL) {
+        fprintf(stderr, MemAllocErrMsg);
+        return MemAllocErr;
+    }
+    (*T)->a = word_temp;
+
+    /* 기존 데이터를 shift_words만큼 왼쪽으로 이동 */
+    memmove((*T)->a + shift_words, (*T)->a, original_len * sizeof(word));
+    
+    /* 새로 확장된 부분을 0으로 초기화 */
+    memset((*T)->a, 0, shift_words * sizeof(word));
+    
+    return CLEAR;
 }

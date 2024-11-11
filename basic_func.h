@@ -96,4 +96,13 @@ msg bi_compareABS(IN bigint** A, IN bigint** B);
  */
 msg bi_compare(IN bigint** A, IN bigint** B);
 
+/**
+ * @brief 워드 단위로 Left Shift
+ *
+ * @param[in] T Left Shift 대상 큰 정수의 이중 포인터
+ * @param[in] shift_words shift 이동량
+ * @return 성공 실패 여부 반환
+ */
+msg bi_shift_left(UPDATE bigint** T, IN int shift_words);
+
 #endif  // BASIC_FUNC_H

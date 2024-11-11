@@ -16,25 +16,28 @@ typedef uint8_t     byte;
 typedef uint32_t     msg;                            // MESSAGE type
 
 #if    WORD_BITLEN == 8
-    typedef uint8_t     word;
-    #define FORMAT "%02x"
+    typedef uint8_t         word;
+    #define WORD_MASK       0x0F
+    #define FORMAT          "%02x"
     #define TEST_WORD_LEN   64
 #elif  WORD_BITLEN == 32
-    typedef uint32_t    word;
-    #define FORMAT "%08x"
+    typedef uint32_t        word;
+    #define WORD_MASK       0x0000FFFF
+    #define FORMAT          "%08x"
     #define TEST_WORD_LEN   32
 
 #elif  WORD_BITLEN == 64
-    typedef uint64_t    word;
-    #define FORMAT "%016llx"
+    typedef uint64_t        word;
+    #define WORD_MASK       0x00000000FFFFFFFF
+    #define FORMAT          "%016llx"
     #define TEST_WORD_LEN   16
 
 #else
     #pragma message(UnSupportWordBitLenErrMsg) // 지원하지 않는 word bitlen
-    typedef uint32_t    word;
-    #define FORMAT "%08x"
+    typedef uint32_t        word;
+    #define WORD_MASK       0xFFFF
+    #define FORMAT          "%08x"
     #define TEST_WORD_LEN   32
-
 #endif
 
 #define WORD_ARR_BYTELEN(word_len) (sizeof(word) * (word_len))   // WORD 배열의 BYTE 길이

@@ -14,7 +14,7 @@
  * @param[in] c 이전 연산의 carry 비트
  * @return 덧셈 후 carry 비트 반환
  */
-msg bi_add_ABc(OUT word* C, IN word A, IN word B, IN int c);
+msg bi_add_ABc(OUT word* C, IN word* A, IN word* B, IN int c);
 
 /**
  * @brief carry와 두 개의 부호가 같은 큰 정수의 덧셈(word_len(A) >= word_len(B))
@@ -25,6 +25,9 @@ msg bi_add_ABc(OUT word* C, IN word A, IN word B, IN int c);
  * @return 성공 실패 여부 반환
  */
 msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B);
+
+
+//msg bi_addc_using_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
 
 /**
  * @brief 두 개의 큰 정수의 덧셈
@@ -45,7 +48,7 @@ msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B);
  * @param[in] B 두 번째 배열(뺄 배열)
  * @return 뺄셈 후 borrow 비트 반환
  */
-msg bi_sub_AbB(OUT word* C, IN word A, IN int b, IN word B);
+msg bi_sub_AbB(OUT word* C, IN word* A, IN int b, IN word* B);
 
 /**
  * @brief borrow와 두 개의 부호가 같은 큰 정수의 뺄셈(A >= B > 0)
@@ -66,5 +69,28 @@ msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B);
  * @return 성공 실패 여부 반환
  */
 msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B);
+
+
+/**
+ * @brief 단일 워드 곱셈
+ *
+ * @param[out] C[2] 단일 워드 곱셈 결과 반환
+ * @param[in] A 첫 번째 단일 워드
+ * @param[in] B 두 번째 단일 워드
+ * @return 성공 실패 여부 반환
+ */
+msg bi_mul_AB(OUT word C[2], IN word* A, IN word* B);
+
+/**
+ * @brief textbook 곱셈
+ *
+ * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
+ * @param[in] A 첫 번째 큰 정수의 이중 포인터
+ * @param[in] B 두 번째 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
+
+
 
 #endif  // CALC_OPERATIONS_H
