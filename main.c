@@ -19,16 +19,32 @@ int main() {
     bigint* A = NULL;
     bigint* B = NULL;
     bigint* C = NULL;
+    bigint* Q = NULL;
+    bigint* R = NULL;
+
     msg result;
-    
-    //result = test_bi_add(10);
+
+    //result = test_bi_add(100);
     //printf("%d\n", result);
 
-    //result = test_bi_sub(10);
+    //result = test_bi_sub(100);
     //printf("%d\n", result);
 
-    result = test_bi_textbook_mulc(10);
-    printf("%d\n", result);
+    //result = test_bi_textbook_mulc(100);
+    //printf("%d\n", result);
+
+    result = test_bi_long_div(100);
+    //printf("%d\n", result);
+
+    /*bi_set_from_string(&A, "1234567890000", 16);
+    bi_set_from_string(&B, "123456789", 16);
+    bi_print(A, 16);
+    printf("\n");
+    bi_print(B, 16);
+    printf("\n");
+    result = bi_karatsuba_mulc(&C, &A, &B, 1);
+    bi_print(C, 16);
+    printf("\n");*/
 
     bi_delete(&A);
     bi_delete(&B);

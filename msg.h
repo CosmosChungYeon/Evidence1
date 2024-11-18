@@ -35,6 +35,8 @@
 #define WordLenErr              0x0201   // 513: 워드 길이 오류
 /** @brief 문자열 NULL 오류 */
 #define StrNULLErr              0x0202   // 514: 문자열 NULL 오류
+/** @brief divisor 0 오류 */
+#define ZeroDivisorErr			0x0203   // 515: Divisor 0 오류
 /**@}*/
 
 /** @name BASE 입력 관련 오류 */
@@ -68,6 +70,7 @@
 #define SignValErrMsg               "Error: Invalid sign value (must be 0(+) or 1(-))\n\n"
 #define WordLenErrMsg               "Error: Invalid word_len value (must be > 0)\n\n"
 #define StrNULLErrMsg               "Error: Int_Str array is NULL\n\n"
+#define ZeroDivisorErrMsg			"Error: Invalid divisor value (must not be zero)\n\n"
 
 #define UnSupportBaseErrMsg         "Error: Unsupported base (only 2(0b), 10, 16(0x))\n\n"
 #define BinInputErrMsg              "Error: Invalid binary value (0~1)\n\n"
