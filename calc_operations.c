@@ -342,7 +342,5 @@ msg bi_improved_textbook_mul(OUT bigint** C, IN bigint** A, IN bigint** B) {
         bi_delete(&T);
     }
 
-    return bi_refine(*C);
-    
-    
+    return bi_refine(*C);   
 }
