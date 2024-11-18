@@ -1,4 +1,3 @@
-
 #include "calc_operations.h"
 #include "basic_func.h"
 #include "config.h"
@@ -287,7 +286,6 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     }
     return bi_refine(*C);
 }
-
 
 msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     /* bigint NULL 체크 */
