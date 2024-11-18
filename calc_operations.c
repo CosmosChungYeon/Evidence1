@@ -1,4 +1,3 @@
-
 #include "calc_operations.h"
 #include "basic_func.h"
 #include "config.h"
@@ -290,4 +289,60 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
         }
     }
     return bi_refine(*C);
+}
+
+msg bi_improved_textbook_mul(OUT bigint** C, IN bigint** A, IN bigint** B) {
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+    int i, k;
+
+    // 오류 메세지 출력을 위함
+    msg result;
+
+    // 결과 초기화
+    bi_new(C, 2);
+
+    // i를 0에서 2 * m - 1까지 반복하는 외부 루프
+    for (i = 0; i < 2 * m; i++) {
+        bigint* T0 = NULL;
+        bigint* T1 = NULL;
+
+        // T0와 T1 초기화
+        // result = bi_new(&T0, 1);   // T0는 처음에 NULL
+        result = bi_new(&T1, sizeof(word));   // T1은 word 너비 w의 0으로 초기화
+
+        // k를 0에서 n - 1까지 반복하는 내부 루프
+        for (k = 0; k < n; k++) {
+            // T0 <- A[2k] * B[i] || T0
+            word* temp0 = (word*)realloc((*C)->a, 2 * sizeof(word));
+            bi_mul_AB(&temp0, &((*A)->a[2 * k]), &((*B)->a[i]));
+            T0 = T0 || temp0->a;
+
+            // T1 <- A[2k+1] * B[i] || T1
+            word* temp1 = (word*)realloc((*C)->a, 2 * sizeof(word));;
+            bi_mul_AB(&temp1, &((*A)->a[2 * k + 1]), &((*B)->a[i]));
+            T1 = T1 || temp1->a;
+
+            bi_delete(&temp0);
+            bi_delete(&temp1);
+        }
+
+        // T <- ADDC(T0, T1)
+        bigint* T;
+        bi_addc(&T, T0, T1);
+
+        // T <- T << w * i
+        bi_shift_left(&T, sizeof(word) * i);
+
+        // C <- ADDC(C, T)
+        bi_addc(C, C, &T);
+
+        bi_delete(&T0);
+        bi_delete(&T1);
+        bi_delete(&T);
+    }
+
+    return bi_refine(*C);
+    
+    
 }
