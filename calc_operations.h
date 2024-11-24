@@ -92,6 +92,26 @@ msg bi_mul_AB(OUT word C[2], IN word* A, IN word* B);
 msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
 
 /**
+ * @brief karatsuba 곱셈
+ *
+ * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
+ * @param[in] A 첫 번째 큰 정수의 이중 포인터
+ * @param[in] B 두 번째 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
+
+/**
+ * @brief 부호 고려 곱셈
+ *
+ * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
+ * @param[in] A 첫 번째 큰 정수의 이중 포인터
+ * @param[in] B 두 번째 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
+
+/**
  * @brief long division bit 나눗셈
  *
  * @param[out] Q 나눗셈 결과 몫 큰 정수의 이중 포인터
@@ -101,5 +121,7 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
  * @return 성공 실패 여부 반환
  */
 msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
+
+msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
 
 #endif  // CALC_OPERATIONS_H

@@ -33,7 +33,6 @@ typedef uint64_t        word;
 #define MSB_BIT_MASK	0x8000000000000000
 #define FORMAT          "%016llx"
 #define TEST_WORD_LEN   16
-
 #else
 #pragma message(UnSupportWordBitLenErrMsg) // 지원하지 않는 word bitlen
 typedef uint32_t        word;
@@ -44,6 +43,6 @@ typedef uint32_t        word;
 
 #define WORD_ARR_BYTELEN(word_len) (sizeof(word) * (word_len))   // WORD 배열의 BYTE 길이
 
-
+#define FLAG			6
 
 #endif  // CONFIG_H
