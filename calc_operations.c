@@ -280,6 +280,96 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     return bi_refine(*C);
 }
 
+msg bi_improved_textbook_mulc(bigint **C, bigint **A, bigint **B) {
+    
+    /* A와 B의 길이가 홀수라면 마지막에 0을 추가하여 짝수로 맞춘다. */
+    if ((*A)->word_len % 2 == 1) {
+        int new_len = (*A)->word_len + 1; // 길이를 1 증가
+        word* temp = (word*)realloc((*A)->a, new_len * sizeof(word));
+        if (temp == NULL) {
+            fprintf(stderr, MemAllocErrMsg);
+            return MemAllocErr;
+        }
+        (*A)->a = temp;
+        (*A)->a[new_len - 1] = 0; // 새로 추가된 워드를 0으로 초기화
+        (*A)->word_len = new_len;
+    }
+
+    if ((*B)->word_len % 2 == 1) {
+        int new_len = (*B)->word_len + 1; // 길이를 1 증가
+        word* temp = (word*)realloc((*B)->a, new_len * sizeof(word));
+        if (temp == NULL) {
+            fprintf(stderr, MemAllocErrMsg);
+            return MemAllocErr;
+        }
+        (*B)->a = temp;
+        (*B)->a[new_len - 1] = 0; // 새로 추가된 워드를 0으로 초기화
+        (*B)->word_len = new_len;
+    }
+
+    /* A와 B의 워드 길이를 구합니다. */
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+
+    /* 결과 큰 정수 C 초기화 */
+    bi_new(C, n + m);
+
+    bigint *T0 = NULL, *T1 = NULL, *T = NULL;
+    bigint *temp0 = NULL, *temp1 = NULL;
+    /* 주어진 알고리즘대로 모든 조합의 곱셈을 수행 */
+    for (int i = 0; i < m; i++) {
+        bi_new(&T0, n);
+        bi_new(&T1, n);
+
+        for (int k = 0; k < n; k += 2) {
+            bi_new(&temp0, 2);
+            bi_new(&temp1, 2);
+            bi_mul_AB(temp0->a, &((*A)->a[k]), &((*B)->a[i]));
+            bi_mul_AB(temp1->a, &((*A)->a[k + 1]), &((*B)->a[i]));
+            T0->a[k] += temp0->a[0];
+            T0->a[k + 1] += temp0->a[1];
+
+            T1->a[k] += temp1->a[0];
+            T1->a[k + 1] += temp1->a[1];
+
+            /* 초기화 */
+            bi_delete(&temp0);
+            bi_delete(&temp1);
+        }
+        
+        // T0과 T1을 합치고, 필요한 만큼 비트 시프트를 적용합니다.
+        bi_new(&T, n + 2);
+        bi_word_shift_left(&T1, 1); // 시프트 적용
+        bi_addc(&T, &T1, &T0); // T = T0 + T1
+        bi_word_shift_left(&T, i); // 시프트 적용
+        bi_addc(C, C, &T);  // C = C + T
+
+        /* C에서 carry 발생을 고려하여 C의 워드 길이 1 증가 */
+        int required_len = n + m;
+        if ((*C)->word_len < required_len) {
+            // bigint의 배열 확장
+            word* temp = (word*)realloc((*C)->a, required_len * sizeof(word));
+            if (temp == NULL) {
+                fprintf(stderr, MemAllocErrMsg);
+                return MemAllocErr;
+            }
+            (*C)->a = temp;
+
+            /* 새로 확장된 부분을 0으로 초기화 */
+            memset((*C)->a + (*C)->word_len, 0, (required_len - (*C)->word_len) * sizeof(word));
+            (*C)->word_len = required_len;
+        }
+        
+
+        /* 초기화 */
+        bi_delete(&T0);
+        bi_delete(&T1);
+        bi_delete(&T);
+    }
+
+    return bi_refine(*C); // C의 불필요한 leading zeros 제거
+}
+
 msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int n = (*A)->word_len;
     int m = (*B)->word_len;

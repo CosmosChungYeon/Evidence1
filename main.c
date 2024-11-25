@@ -66,6 +66,13 @@ int main() {
 
     /*clock_t start, end;
     start = clock();
+    result = test_bi_improved_textbook_mulc(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+
+    /*clock_t start, end;
+    start = clock();
     result = test_bi_long_div(100);
     end = clock();
     double duration = ((double)(end - start)) / CLOCKS_PER_SEC;

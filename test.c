@@ -182,6 +182,45 @@ msg test_bi_mul(int test_num) {
     return CLEAR;
 }
 
+msg test_bi_improved_textbook_mulc(int test_num) {
+    for (int i = 0; i < test_num; i++) {
+        bigint* A = NULL;
+        bigint* B = NULL;
+        bigint* C = NULL;
+        msg result;
+
+        result = bi_get_random(&A, TEST_WORD_LEN);
+        result = bi_get_random(&B, TEST_WORD_LEN);
+
+        A->sign = NON_NEGATIVE;
+        B->sign = NON_NEGATIVE;
+
+        printf("a = ");
+        bi_print(A, 16);
+        printf("\n");
+        printf("b = ");
+        bi_print(B, 16);
+        printf("\n");
+        bi_improved_textbook_mulc(&C, &A, &B);
+        bi_delete(&A);
+        bi_delete(&B);
+        printf("c = a * b\n");
+        printf("if (c != ");
+        bi_print(C, 16);
+        printf("):\n");
+        printf("    print('a = ', hex(a))\n");
+        printf("    print('b = ', hex(b))\n");
+        printf("    print('c = ', hex(c))\n");
+        printf("    print('wrong answer = ', hex(");
+        bi_print(C, 16);
+        printf("))\n");
+
+        bi_delete(&C);
+    }
+    return CLEAR;
+}
+
+
 msg test_bi_long_div(int test_num) {
     printf("cnt = 0\n");
     for (int i = 0; i < test_num; i++) {
