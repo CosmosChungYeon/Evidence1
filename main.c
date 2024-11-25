@@ -1,3 +1,4 @@
+
 #include <stdio.h>      // printf
 #include <stdlib.h>     // calloc, realloc
 #include <stdint.h>     // uint32_t
@@ -5,6 +6,7 @@
 #include <time.h>       // bi_gen_random
 
 #include "basic_func.h"
+#include "calc_operations.h"
 #include "config.h"
 #include "bi_def.h"
 #include "msg.h"
@@ -14,61 +16,102 @@
 
 int main() {
     srand(time(NULL));
-    msg result;
-    result = test_bi_set_from_array();
-    result = test_bi_set_from_string();
-    result = test_bi_new();
-    result = test_bi_delete();
-    result = test_bi_gen_random();
-    result = test_bi_refine();
-    result = test_bi_assign();
 
-    bigint* A; // bigint 구조
+    bigint* A = NULL;
     bigint* B = NULL;
     bigint* C = NULL;
-    bigint* D = NULL;
-    bigint* E = NULL;
+    bigint* Q = NULL;
+    bigint* R = NULL;
 
-    // 1. bi_set_from_array
-    word arr[] = {0x12345678, 0x9ABCDEF0};
-    result = bi_set_from_array(&A, 0, 2, arr);
-    printf("bi_set_from_array result: %d\n", result);
-    bi_print(A, 16);
+    msg result;
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_add(10000);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+    //printf("%d\n", result);
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_sub(10000);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+    //printf("%d\n", result);
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_textbook_mulc(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+    //printf("%d\n", result);
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_karatsuba_mulc(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+    //printf("%d\n", result);
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_mul(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_improved_textbook_mulc(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_long_div(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+    //printf("%d\n", result);
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_div(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);*/
+
+    ////word a[] = { 0xf9, 0x99, 0x2e, 0x0b, 0x06, 0x0a, 0x62, 0x91 };
+    ////word b[] = { 0x32, 0x70, 0x0b, 0x6d, 0x56, 0x3a, 0x07, 0x06 };
+    ////word a[] = { 0x0b2e99f9, 0x91620a06 };
+    ////word b[] = { 0x6d0b7032, 0x06073a56 };
+    ////word a[] = { 0x91620a060b2e99f9 };
+    ////word b[] = { 0x06073a566d0b7032 };
+    //bi_set_from_string(&A, "91620a060b2e99f9", 16);
+    //bi_set_from_string(&B, "6073a566d0b7032", 16);
+    ////bi_set_from_array(&A, 0, 1, a);
+    ////bi_set_from_array(&B, 0, 1, b);
+    //bi_print(A, 16);
+    //printf("\n");
+    //bi_print(B, 16);
+    //printf("\n");
+    //result = bi_long_div(&Q, &R, &A, &B);
+    //bi_print(Q, 16);
+    //printf("\n");
+    //bi_print(R, 16);
+    //printf("\n");
+    //printf("return = %d", result);
+
     bi_delete(&A);
-
-    // 2. bi_set_from_string
-    result = bi_set_from_string(&B, "000000001123456789", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(B, 16);
     bi_delete(&B);
-
-    // 3. bi_set_from_string
-    result = bi_set_from_string(&C, "-11A2B3C4D", 16);
-    printf("bi_set_from_string result (16): %d\n", result);
-    bi_print(C, 16);
     bi_delete(&C);
+    bi_delete(&Q);
+    bi_delete(&R);
 
-    // 4. bi_get_random
-    result = bi_get_random(&D, 2);
-    printf("bi_get_random result: %d\n", result);
-    bi_print(D, 16);
-
-    // 5. bi_assign
-    result = bi_assign(&E, D);
-    printf("bi_assign result: %d\n", result);
-    printf("Copied bigint:\n");
-    bi_print(E, 2);
-    bi_delete(&E);
-
-    // 6. bi_refine
-    result = bi_set_from_string(&E, "0000000000000000000000000000000000000000001111001010101", 2);
-    printf("word_len = %d\n", E->word_len);
-    bi_print(E, 16);
-
-    // 7. bi_delete
-    bi_delete(&E);
-    if (E == NULL) {
-        printf("bi_delete successful.\n");
-    }
     return 0;
 }
