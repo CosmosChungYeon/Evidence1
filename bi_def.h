@@ -6,7 +6,7 @@
 /**
  * @struct bigint
  * @brief 큰 정수를 나타내는 구조체
- * 
+ *
  * 큰 정수에 대한 부호, 배열 길이, 배열에 대한 정보 저장
  */
 typedef struct {

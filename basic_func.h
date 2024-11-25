@@ -106,6 +106,15 @@ msg bi_compare(IN bigint** A, IN bigint** B);
 msg bi_word_shift_left(UPDATE bigint** T, IN int shift_words);
 
 /**
+ * @brief 워드 단위로 Right Shift
+ *
+ * @param[in] T Right Shift 대상 큰 정수의 이중 포인터
+ * @param[in] shift_words shift 이동량
+ * @return 성공 실패 여부 반환
+ */
+msg bi_word_shift_right(UPDATE bigint** T, IN int shift_words);
+
+/**
  * @brief bigint 워드 값 더블링(2배)
  *
  * @param[in] R 더블링 대상 큰 정수의 포인터

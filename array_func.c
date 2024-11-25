@@ -39,3 +39,4 @@ msg array_rand(OUT word* dst, IN int word_len) {
     }
     return CLEAR;
 }
+

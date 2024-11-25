@@ -10,19 +10,21 @@ msg test_bi_add(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
-        /*printf("a = ");
+        printf("a = ");
         bi_print(A, 16);
         printf("\n");
         printf("b = ");
         bi_print(B, 16);
-        printf("\n");*/
+        printf("\n");
         bi_add(&C, &A, &B);
         bi_delete(&A);
         bi_delete(&B);
-        /*printf("c = a + b\n");
+        printf("c = a + b\n");
         printf("if (c != ");
         bi_print(C, 16);
         printf("):\n");
@@ -31,7 +33,7 @@ msg test_bi_add(int test_num) {
         printf("    print('c = ', hex(c))\n");
         printf("    print('wrong answer = ', hex(");
         bi_print(C, 16);
-        printf("))\n");*/
+        printf("))\n");
 
         bi_delete(&C);
     }
@@ -45,19 +47,21 @@ msg test_bi_sub(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
-        /*printf("a = ");
+        printf("a = ");
         bi_print(A, 16);
         printf("\n");
         printf("b = ");
         bi_print(B, 16);
-        printf("\n");*/
+        printf("\n");
         bi_sub(&C, &A, &B);
         bi_delete(&A);
         bi_delete(&B);
-        /*printf("c = a - b\n");
+        printf("c = a - b\n");
         printf("if (c != ");
         bi_print(C, 16);
         printf("):\n");
@@ -66,7 +70,7 @@ msg test_bi_sub(int test_num) {
         printf("    print('c = ', hex(c))\n");
         printf("    print('wrong answer = ', hex(");
         bi_print(C, 16);
-        printf("))\n");*/
+        printf("))\n");
 
         bi_delete(&C);
     }
@@ -79,23 +83,25 @@ msg test_bi_textbook_mulc(int test_num) {
         bigint* B = NULL;
         bigint* C = NULL;
         msg result;
-
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
         A->sign = NON_NEGATIVE;
         B->sign = NON_NEGATIVE;
 
-        /*printf("a = ");
+        printf("a = ");
         bi_print(A, 16);
         printf("\n");
         printf("b = ");
         bi_print(B, 16);
-        printf("\n");*/
+        printf("\n");
         bi_textbook_mulc(&C, &A, &B);
         bi_delete(&A);
         bi_delete(&B);
-        /*printf("c = a * b\n");
+        printf("c = a * b\n");
         printf("if (c != ");
         bi_print(C, 16);
         printf("):\n");
@@ -104,7 +110,47 @@ msg test_bi_textbook_mulc(int test_num) {
         printf("    print('c = ', hex(c))\n");
         printf("    print('wrong answer = ', hex(");
         bi_print(C, 16);
-        printf("))\n");*/
+        printf("))\n");
+
+        bi_delete(&C);
+    }
+    return CLEAR;
+}
+
+msg test_bi_improved_textbook_mulc(int test_num) {
+    for (int i = 0; i < test_num; i++) {
+        bigint* A = NULL;
+        bigint* B = NULL;
+        bigint* C = NULL;
+        msg result;
+
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
+
+        A->sign = NON_NEGATIVE;
+        B->sign = NON_NEGATIVE;
+
+        printf("a = ");
+        bi_print(A, 16);
+        printf("\n");
+        printf("b = ");
+        bi_print(B, 16);
+        printf("\n");
+        bi_improved_textbook_mulc(&C, &A, &B);
+        bi_delete(&A);
+        bi_delete(&B);
+        printf("c = a * b\n");
+        printf("if (c != ");
+        bi_print(C, 16);
+        printf("):\n");
+        printf("    print('a = ', hex(a))\n");
+        printf("    print('b = ', hex(b))\n");
+        printf("    print('c = ', hex(c))\n");
+        printf("    print('wrong answer = ', hex(");
+        bi_print(C, 16);
+        printf("))\n");
 
         bi_delete(&C);
     }
@@ -118,8 +164,10 @@ msg test_bi_karatsuba_mulc(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
         A->sign = NON_NEGATIVE;
         B->sign = NON_NEGATIVE;
@@ -155,8 +203,10 @@ msg test_bi_mul(int test_num) {
         bigint* C = NULL;
         msg result;
 
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
         printf("a = ");
         bi_print(A, 16);
@@ -191,8 +241,10 @@ msg test_bi_long_div(int test_num) {
         bigint* R = NULL;
         msg result;
 
-        result = bi_get_random(&A, TEST_WORD_LEN);
-        result = bi_get_random(&B, TEST_WORD_LEN);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
         A->sign = NON_NEGATIVE;
         B->sign = NON_NEGATIVE;
@@ -254,8 +306,10 @@ msg test_bi_div(int test_num) {
         bigint* R = NULL;
         msg result;
 
-        result = bi_get_random(&A, 3);
-        result = bi_get_random(&B, 2);
+        int A_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        int B_word_len = 1 + rand() % (TEST_WORD_LEN - 1);
+        result = bi_get_random(&A, A_word_len);
+        result = bi_get_random(&B, B_word_len);
 
         printf("a = ");
         bi_print(A, 16);

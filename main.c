@@ -46,8 +46,15 @@ int main() {
     result = test_bi_textbook_mulc(100);
     end = clock();
     double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Execution Time: %.6f seconds\n", duration);
+    printf("%d\n", result);*/
+
+    /*clock_t start, end;
+    start = clock();
+    result = test_bi_improved_textbook_mulc(100);
+    end = clock();
+    double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("Execution Time: %.6f seconds\n", duration);*/
-    //printf("%d\n", result);
 
     /*clock_t start, end;
     start = clock();
@@ -57,12 +64,12 @@ int main() {
     printf("Execution Time: %.6f seconds\n", duration);*/
     //printf("%d\n", result);
 
-    /*clock_t start, end;
+    clock_t start, end;
     start = clock();
     result = test_bi_mul(100);
     end = clock();
     double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
-    printf("Execution Time: %.6f seconds\n", duration);*/
+    printf("Execution Time: %.6f seconds\n", duration);
 
     /*clock_t start, end;
     start = clock();
@@ -99,6 +106,12 @@ int main() {
     //bi_print(R, 16);
     //printf("\n");
     //printf("return = %d", result);
+
+    /*bi_set_from_string(&A, "abb0616249965468e4918df635ab4f76035cd47eb064e2b769560cfd8f798c29d02f28246294bccfe3759dcbeb5458911c227c226edb059575b2f3514b74503e", 16);
+    bi_set_from_string(&B, "2ec32102c090d50dc6eba1cdd20152495d59ae57c8b19a38138b7196dfa4eebc", 16);
+    result = bi_karatsuba_mulc(&C, &A, &B);
+    bi_print(C, 16); printf("\n");*/
+
 
     bi_delete(&A);
     bi_delete(&B);

@@ -280,87 +280,243 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     return bi_refine(*C);
 }
 
+msg bi_improved_textbook_mulc(bigint **C, bigint **A, bigint **B) {
+    
+    /* A와 B의 길이가 홀수라면 마지막에 0을 추가하여 짝수로 맞춘다. */
+    if ((*A)->word_len % 2 == 1) {
+        int new_len = (*A)->word_len + 1; // 길이를 1 증가
+        word* temp = (word*)realloc((*A)->a, new_len * sizeof(word));
+        if (temp == NULL) {
+            fprintf(stderr, MemAllocErrMsg);
+            return MemAllocErr;
+        }
+        (*A)->a = temp;
+        (*A)->a[new_len - 1] = 0; // 새로 추가된 워드를 0으로 초기화
+        (*A)->word_len = new_len;
+    }
+
+    if ((*B)->word_len % 2 == 1) {
+        int new_len = (*B)->word_len + 1; // 길이를 1 증가
+        word* temp = (word*)realloc((*B)->a, new_len * sizeof(word));
+        if (temp == NULL) {
+            fprintf(stderr, MemAllocErrMsg);
+            return MemAllocErr;
+        }
+        (*B)->a = temp;
+        (*B)->a[new_len - 1] = 0; // 새로 추가된 워드를 0으로 초기화
+        (*B)->word_len = new_len;
+    }
+
+    /* A와 B의 워드 길이를 구합니다. */
+    int n = (*A)->word_len;
+    int m = (*B)->word_len;
+
+    /* 결과 큰 정수 C 초기화 */
+    bi_new(C, n + m);
+
+    bigint *T0 = NULL, *T1 = NULL, *T = NULL;
+    bigint *temp0 = NULL, *temp1 = NULL;
+    /* 주어진 알고리즘대로 모든 조합의 곱셈을 수행 */
+    for (int i = 0; i < m; i++) {
+        bi_new(&T0, n);
+        bi_new(&T1, n);
+
+        for (int k = 0; k < n; k += 2) {
+            bi_new(&temp0, 2);
+            bi_new(&temp1, 2);
+            bi_mul_AB(temp0->a, &((*A)->a[k]), &((*B)->a[i]));
+            bi_mul_AB(temp1->a, &((*A)->a[k + 1]), &((*B)->a[i]));
+            T0->a[k] += temp0->a[0];
+            T0->a[k + 1] += temp0->a[1];
+
+            T1->a[k] += temp1->a[0];
+            T1->a[k + 1] += temp1->a[1];
+
+            /* 초기화 */
+            bi_delete(&temp0);
+            bi_delete(&temp1);
+        }
+        
+        // T0과 T1을 합치고, 필요한 만큼 비트 시프트를 적용합니다.
+        bi_new(&T, n + 2);
+        bi_word_shift_left(&T1, 1); // 시프트 적용
+        bi_addc(&T, &T1, &T0); // T = T0 + T1
+        bi_word_shift_left(&T, i); // 시프트 적용
+        bi_addc(C, C, &T);  // C = C + T
+
+        /* C에서 carry 발생을 고려하여 C의 워드 길이 1 증가 */
+        int required_len = n + m;
+        if ((*C)->word_len < required_len) {
+            // bigint의 배열 확장
+            word* temp = (word*)realloc((*C)->a, required_len * sizeof(word));
+            if (temp == NULL) {
+                fprintf(stderr, MemAllocErrMsg);
+                return MemAllocErr;
+            }
+            (*C)->a = temp;
+
+            /* 새로 확장된 부분을 0으로 초기화 */
+            memset((*C)->a + (*C)->word_len, 0, (required_len - (*C)->word_len) * sizeof(word));
+            (*C)->word_len = required_len;
+        }
+        
+
+        /* 초기화 */
+        bi_delete(&T0);
+        bi_delete(&T1);
+        bi_delete(&T);
+    }
+
+    return bi_refine(*C); // C의 불필요한 leading zeros 제거
+}
+
 msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int n = (*A)->word_len;
     int m = (*B)->word_len;
 
-    /* 기본 처리: 곱할 숫자 중 하나가 0인 경우 */
-    if (n == 0 || m == 0) {
+    int max_len = (n > m) ? n : m;
+    int min_len = (n > m) ? m : n;
+
+    if (((n == 1) && ((*A)->a[0] == 0)) || ((m == 1) && ((*B)->a[0] == 0))) {
         bi_new(C, 1);
         (*C)->a[0] = 0;
         return CLEAR;
     }
 
-    /* 작은 입력 크기의 경우 기본 곱셈 호출 */
-    if (n <= FLAG || m <= FLAG) {
-        return bi_textbook_mulc(C, A, B);  // 교재식 곱셈
+    if (min_len <= FLAG) {
+        return bi_textbook_mulc(C, A, B);
     }
 
-    /* A와 B의 상/하위 계산 */
-    int max_len = (n > m ? n : m);  // 최대 길이
-    int half_len = max_len / 2;     // 절반 길이
+    int lw_len = (max_len + 1) >> 1;
 
-    /* A_low, A_high를 직접 처리 */
-    bigint* A_low = NULL, * A_high = NULL;
-    bi_new(&A_low, half_len);
-    bi_new(&A_high, n > half_len ? n - half_len : 0);
+    bigint* A1 = NULL, * A0 = NULL;
+    bigint* B1 = NULL, * B0 = NULL;
+    bigint* T1 = NULL, * T0 = NULL;
+    bigint* T_tmp = NULL;
+    bigint* S1 = NULL, * S0 = NULL;
+    bigint* S = NULL;
+    bigint* S_sum1 = NULL, * S_sum2 = NULL;
+    bigint* C_tmp = NULL;
 
-    memcpy(A_low->a, (*A)->a, sizeof(word) * half_len);  // 하위 복사
-    if (A_high->word_len > 0) {
-        memcpy(A_high->a, (*A)->a + half_len, sizeof(word) * A_high->word_len);  // 상위 복사
+    bi_new(&A1, lw_len); bi_new(&A0, lw_len);
+    bi_new(&B1, lw_len); bi_new(&B0, lw_len);
+
+    // A1: 상위 부분 복사
+    for (int i = 0; i < A1->word_len; i++) {
+        if (i + lw_len < n) {
+            A1->a[i] = (*A)->a[i + lw_len];
+        }
+        else {
+            A1->a[i] = 0;  // 나머지는 0으로 채움
+        }
     }
 
-    /* B_low, B_high를 직접 처리 */
-    bigint* B_low = NULL, * B_high = NULL;
-    bi_new(&B_low, half_len);
-    bi_new(&B_high, m > half_len ? m - half_len : 0);
-
-    memcpy(B_low->a, (*B)->a, sizeof(word) * half_len);  // 하위 복사
-    if (B_high->word_len > 0) {
-        memcpy(B_high->a, (*B)->a + half_len, sizeof(word) * B_high->word_len);  // 상위 복사
+    // A0: 하위 부분 복사
+    for (int i = 0; i < lw_len; i++) {
+        if (i < n) {
+            A0->a[i] = (*A)->a[i];
+        }
+        else {
+            A0->a[i] = 0;  // 나머지는 0으로 채움
+        }
     }
 
-    /* Z2 = A_high * B_high */
-    bigint* Z2 = NULL;
-    bi_karatsuba_mulc(&Z2, &A_high, &B_high);
+    // B1: 상위 부분 복사
+    for (int i = 0; i < B1->word_len; i++) {
+        if (i + lw_len < m) {
+            B1->a[i] = (*B)->a[i + lw_len];
+        }
+        else {
+            B1->a[i] = 0;  // 나머지는 0으로 채움
+        }
+    }
 
-    /* Z0 = A_low * B_low */
-    bigint* Z0 = NULL;
-    bi_karatsuba_mulc(&Z0, &A_low, &B_low);
+    // B0: 하위 부분 복사
+    for (int i = 0; i < lw_len; i++) {
+        if (i < m) {
+            B0->a[i] = (*B)->a[i];
+        }
+        else {
+            B0->a[i] = 0;  // 나머지는 0으로 채움
+        }
+    }
 
-    /* Z1 = (A_high + A_low) * (B_high + B_low) - Z2 - Z0 */
-    bigint* A_sum = NULL, * B_sum = NULL, * Z1 = NULL;
-    bi_add(&A_sum, &A_high, &A_low);  // A_high + A_low
-    bi_add(&B_sum, &B_high, &B_low);  // B_high + B_low
-    bi_karatsuba_mulc(&Z1, &A_sum, &B_sum);
+    bi_karatsuba_mulc(&T1, &A1, &B1);
+    bi_karatsuba_mulc(&T0, &A0, &B0);
+    //printf("A1B1 = "); bi_print(T1, 16); printf("\n");
+    //printf("A0B0 = "); bi_print(T0, 16); printf("\n");
 
-    bi_subc(&Z1, &Z1, &Z2);  // Z1 -= Z2
-    bi_subc(&Z1, &Z1, &Z0);  // Z1 -= Z0
+    bi_assign(&T_tmp, T1);
+    bi_word_shift_left(&T_tmp, 2 * lw_len);
+    bi_add(C, &T_tmp, &T0);
+    //printf("C = "); bi_print(*C, 16); printf("\n");
 
-    /* 결과 합산: Z2 << (2 * half_len), Z1 << half_len, Z0 */
-    bi_word_shift_left(&Z2, 2 * half_len);  // Z2를 2배 쉬프트
-    bi_word_shift_left(&Z1, half_len);      // Z1을 1배 쉬프트
+    bi_sub(&S1, &A0, &A1);
+    bi_sub(&S0, &B1, &B0);
+    //printf("S1 = "); bi_print(S1, 16); printf("\n");
+    //printf("S0 = "); bi_print(S0, 16); printf("\n");
 
-    bi_addc(C, &Z2, &Z1);  // C = Z2 + Z1
-    bi_addc(C, C, &Z0);    // C += Z0
+    int sign_S1 = S1->sign;
+    int sign_S0 = S0->sign;
+    S1->sign = NON_NEGATIVE;
+    S0->sign = NON_NEGATIVE;
+    bi_karatsuba_mulc(&S, &S1, &S0);
+    //printf("S = "); bi_print(S, 16); printf("\n");
+    
+    S->sign = (sign_S1 ^ sign_S0) ? NEGATIVE : NON_NEGATIVE;
+    //printf("S = "); bi_print(S, 16); printf("\n");
 
-    /* 메모리 정리 */
-    bi_delete(&A_low);
-    bi_delete(&A_high);
-    bi_delete(&B_low);
-    bi_delete(&B_high);
-    bi_delete(&Z2);
-    bi_delete(&Z0);
-    bi_delete(&Z1);
-    bi_delete(&A_sum);
-    bi_delete(&B_sum);
+    bi_add(&S_sum1, &S, &T1);
+    bi_add(&S_sum2, &S_sum1, &T0);
+    bi_word_shift_left(&S_sum2, lw_len);
+    //printf("S1*S0 + T1T0 = "); bi_print(S_sum2, 16); printf("\n");
+
+
+    bi_assign(&C_tmp, *C);
+    bi_add(C, &C_tmp, &S_sum2);
+    //printf("C = "); bi_print(*C, 16); printf("\n");
+
+    bi_delete(&A1);
+    bi_delete(&A0);
+    bi_delete(&B1);
+    bi_delete(&B0);
+    bi_delete(&S1);
+    bi_delete(&S0);
+    bi_delete(&S);
+    bi_delete(&T1);
+    bi_delete(&T_tmp);
+    bi_delete(&S_sum1);
+    bi_delete(&T0);
+    bi_delete(&S_sum2);
+    bi_delete(&C_tmp);
 
     return bi_refine(*C);
 }
 
 msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B) {
-    bi_karatsuba_mulc(C, A, B);
-    (*C)->sign = (((*A)->sign ^ (*B)->sign) == 0) ? NON_NEGATIVE : NEGATIVE;
+    if (*A == NULL || *B == NULL) {
+        fprintf(stderr, "Error: NULL input in bi_mul.\n");
+        return SrcNULLErr;
+    }
+
+    // 부호 저장
+    int sign_A = (*A)->sign;
+    int sign_B = (*B)->sign;
+
+    // A와 B를 절댓값으로 변환
+    (*A)->sign = NON_NEGATIVE;
+    (*B)->sign = NON_NEGATIVE;
+
+    // 절댓값 곱셈 수행
+    bi_improved_textbook_mulc(C, A, B);
+    //bi_karatsuba_mulc(C, A, B);
+
+    // 결과 부호 설정
+    (*C)->sign = (sign_A == sign_B) ? NON_NEGATIVE : NEGATIVE;
+
+    // A와 B의 원래 부호 복구
+    (*A)->sign = sign_A;
+    (*B)->sign = sign_B;
 
     return CLEAR;
 }
@@ -435,6 +591,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
         fprintf(stderr, ZeroDivisorErrMsg);
         return ZeroDivisorErr;
     }
+
     int sign_A = (*A)->sign;
     int sign_B = (*B)->sign;
 
@@ -442,8 +599,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     (*B)->sign = NON_NEGATIVE;  // B 절댓값
     bi_long_div(Q, R, A, B);  // 절댓값 기준 나눗셈 수행
 
-
-    /* R이 B보다 크거나 같은 경우 보정 */
+    /* A가 음수인 경우 Q = Q + 1, R = B - R */
     if (sign_A == NEGATIVE) {
         bigint* one = NULL;
         bi_set_from_string(&one, "1", 2);  // 1 생성
@@ -455,7 +611,6 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
         bi_assign(R, new_R);  // R 업데이트
         bi_delete(&new_R);
     }
-
 
     (*Q)->sign = (sign_A == sign_B) ? NON_NEGATIVE : NEGATIVE;
     (*R)->sign = NON_NEGATIVE;   // R은 항상 양수
