@@ -25,7 +25,10 @@ msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
     //	return MemAllocErr;
     //}
 
-    memcpy(dst, src, WORD_ARR_BYTELEN(word_len));      // src배열을 dst배열에 복사 (바이트 단위)
+    for (int i = 0; i < word_len; i++) {            // src 배열의 내용을 dst 배열로 복사
+        dst[i] = src[i];
+    }
+    
     return CLEAR;
 }
 

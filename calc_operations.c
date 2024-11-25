@@ -443,38 +443,28 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
 
     bi_karatsuba_mulc(&T1, &A1, &B1);
     bi_karatsuba_mulc(&T0, &A0, &B0);
-    //printf("A1B1 = "); bi_print(T1, 16); printf("\n");
-    //printf("A0B0 = "); bi_print(T0, 16); printf("\n");
 
     bi_assign(&T_tmp, T1);
     bi_word_shift_left(&T_tmp, 2 * lw_len);
     bi_add(C, &T_tmp, &T0);
-    //printf("C = "); bi_print(*C, 16); printf("\n");
 
     bi_sub(&S1, &A0, &A1);
     bi_sub(&S0, &B1, &B0);
-    //printf("S1 = "); bi_print(S1, 16); printf("\n");
-    //printf("S0 = "); bi_print(S0, 16); printf("\n");
 
     int sign_S1 = S1->sign;
     int sign_S0 = S0->sign;
     S1->sign = NON_NEGATIVE;
     S0->sign = NON_NEGATIVE;
     bi_karatsuba_mulc(&S, &S1, &S0);
-    //printf("S = "); bi_print(S, 16); printf("\n");
     
     S->sign = (sign_S1 ^ sign_S0) ? NEGATIVE : NON_NEGATIVE;
-    //printf("S = "); bi_print(S, 16); printf("\n");
 
     bi_add(&S_sum1, &S, &T1);
     bi_add(&S_sum2, &S_sum1, &T0);
     bi_word_shift_left(&S_sum2, lw_len);
-    //printf("S1*S0 + T1T0 = "); bi_print(S_sum2, 16); printf("\n");
-
 
     bi_assign(&C_tmp, *C);
     bi_add(C, &C_tmp, &S_sum2);
-    //printf("C = "); bi_print(*C, 16); printf("\n");
 
     bi_delete(&A1);
     bi_delete(&A0);

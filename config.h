@@ -6,7 +6,7 @@
 #include "msg.h"
 
 
-#define WORD_BITLEN             64                   // OPTION: 8, 32, 64
+#define WORD_BITLEN             32                   // OPTION: 8, 32, 64
 #define BINARY_STRING_LENGTH    (WORD_BITLEN)        // 2진수 문자열 길이
 #define HEX_STRING_LENGTH       (WORD_BITLEN >> 2)   // 16진수 문자열 길이
 

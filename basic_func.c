@@ -31,7 +31,10 @@ msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const w
     bi_new(dst, word_len);
 
     (*dst)->sign = sign;
-    memcpy((*dst)->a, a, word_len * sizeof(word));
+ 
+    for (int i = 0; i < word_len; i++) {            // src 배열의 내용을 dst 배열로 복사
+        (*dst)->a[i] = a[i];
+    }
 
     return bi_refine(*dst);     // 메모리 재할당
 }
