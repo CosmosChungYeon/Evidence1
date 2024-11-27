@@ -43,6 +43,7 @@ typedef uint32_t        word;
 
 #define WORD_ARR_BYTELEN(word_len) (sizeof(word) * (word_len))   // WORD 배열의 BYTE 길이
 
-#define FLAG			6
+#define FLAG			10
+#define RAND_CHOICE		0
 
 #endif  // CONFIG_H

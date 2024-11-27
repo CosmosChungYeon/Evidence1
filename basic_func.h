@@ -45,6 +45,15 @@ msg bi_get_random(OUT bigint** dst, IN int word_len);
 msg bi_print(IN const bigint* dst, IN int base); // const**
 
 /**
+ * @brief 지정된 진수로 큰 정수 파일 출력
+ *
+ * @param[in] dst 대상 큰 정수의 포인터
+ * @param[in] base 진수(2, 10, 16)
+ * @return 성공 실패 여부 반환
+ */
+msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base);
+
+/**
  * @brief 지정된 배열 길이로 큰 정수 초기화
  *
  * @param[out] dst 대상 큰 정수의 이중 포인터

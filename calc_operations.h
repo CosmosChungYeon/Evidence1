@@ -132,6 +132,17 @@ msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
  */
 msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
 
+/**
+ * @brief 부호 고려 나눗셈
+ *
+ * @param[out] Q 나눗셈 결과 몫 큰 정수의 이중 포인터
+ * @param[out] R 나눗셈 결과 나머지 큰 정수의 이중 포인터
+ * @param[in] A dividend 첫 번째 큰 정수의 이중 포인터
+ * @param[in] B divisor 두 번째 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
 msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
+
+msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
 
 #endif  // CALC_OPERATIONS_H

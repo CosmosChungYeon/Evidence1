@@ -384,7 +384,7 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     }
 
     if (min_len <= FLAG) {
-        return bi_textbook_mulc(C, A, B);
+        return bi_improved_textbook_mulc(C, A, B);
     }
 
     int lw_len = (max_len + 1) >> 1;
@@ -608,4 +608,45 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     (*B)->sign = sign_B;  // B 절댓값
 
     return CLEAR;
+}
+
+msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T) {
+    int n = (*N)->word_len;
+    int double_n = (*A)->word_len;
+
+    if ((double_n >> 1) != n) {
+        fprintf(stderr, "Invalid word_len\n");
+        return -1;
+    }
+
+    if ((*A)->sign != NON_NEGATIVE) {
+        fprintf(stderr, "Invalid sign\n");
+        return -1;
+    }
+    bigint* Q_hat = NULL;
+    bigint* A_tmp = NULL;
+    bigint* R_tmp = NULL;
+
+    bi_assign(&A_tmp, *A);
+    bi_word_shift_right(&A_tmp, n - 1);
+    
+    bi_karatsuba_mulc(&Q_hat, &A_tmp, T);
+
+    bi_word_shift_right(&Q_hat, n + 1);
+
+    bi_karatsuba_mulc(&R_tmp, N, &Q_hat);
+
+    bi_sub(R, A, &R_tmp);
+    
+    bi_delete(&R_tmp);
+    bi_refine(*R);
+    bi_refine(*N);
+    while (bi_compareABS(R, N) != COMPARE_LESS) {
+        bigint* new_R = NULL;
+        bi_sub(&new_R, R, N);
+        bi_assign(R, new_R);
+        bi_delete(&new_R);
+    }
+    bi_delete(&Q_hat);
+    bi_delete(&A_tmp);
 }

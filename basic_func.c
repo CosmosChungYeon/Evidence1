@@ -31,7 +31,7 @@ msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const w
     bi_new(dst, word_len);
 
     (*dst)->sign = sign;
- 
+
     for (int i = 0; i < word_len; i++) {            // src 배열의 내용을 dst 배열로 복사
         (*dst)->a[i] = a[i];
     }
@@ -227,6 +227,71 @@ msg bi_print(IN const bigint* dst, IN int base) {
         // 모든 비트가 0일 경우 0 출력
         if (leading_zero) {
             printf("0");
+        }
+    }
+    return CLEAR;
+}
+
+msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base) {
+    /* bigint NULL 체크 */
+    if (dst == NULL || dst->word_len <= 0 || dst->a == NULL) {
+        fprintf(stderr, DSTpNULLErrMsg);
+        return DSTpNULLErr;
+    }
+
+    /* 진수값 체크 */
+    if (base != 2 && base != 16) {
+        fprintf(stderr, UnSupportBaseErrMsg);
+        return UnSupportBaseErr;
+    }
+
+    /* Bigint 출력 */
+    if (dst->sign == NEGATIVE) {        // 부호값 (음의 부호 처리)
+        fprintf(file, "-");
+    }
+
+    /* 2진수 출력 */
+    if (base == 2) {
+        fprintf(file, "0b");
+        int leading_zero = 1;                               // 처음의 0들을 건너뛰기 위한 플래그
+        for (int i = dst->word_len - 1; i >= 0; i--) {      // WORD 배열 인덱스를 역순으로
+            for (int j = WORD_BITLEN - 1; j >= 0; j--) {    // 각 WORD 내 비트를 역순으로
+                int bit = (dst->a[i] >> j) & 1;             // 해당 비트를 추출 (MSB부터)
+                if (bit == 1) {                             // 1이면
+                    leading_zero = 0;                       // leading_zero 해제
+                }
+                if (!leading_zero) {                        // leading_zero 해제된 이후로 계속
+                    fprintf(file, "%d", bit);                      // 출력
+                }
+            }
+        }
+        // 모든 비트가 0일 경우 0 출력
+        if (leading_zero) {
+            fprintf(file, "0");
+        }
+    }
+    /* 16진수 출력 */
+    else if (base == 16) {
+        fprintf(file, "0x");
+        int leading_zero = 1;                                // 처음의 0들을 건너뛰기 위한 플래그
+        for (int i = dst->word_len - 1; i >= 0; i--) {       // WORD 배열 인덱스를 역순으로
+            if (dst->a[i] != 0) {
+                if (leading_zero) {                          // leading_zero가 1인 경우
+                    fprintf(file, FORMAT, dst->a[i]);                 // 패딩 없이 출력
+                    leading_zero = 0;                        // leading_zero 해제
+                }
+                else {
+                    fprintf(file, FORMAT, dst->a[i]);               // 나머지 비트를 8자리로 패딩하여 출력
+                }
+            }
+            else if (!leading_zero) {                      // leading_zero가 해제된 이후는
+                fprintf(file, FORMAT, dst->a[i]);                   // 0포함 출력 (ex. 0x12345678 00012345)
+            }
+        }
+
+        // 모든 비트가 0일 경우 0 출력
+        if (leading_zero) {
+            fprintf(file, "0");
         }
     }
     return CLEAR;
