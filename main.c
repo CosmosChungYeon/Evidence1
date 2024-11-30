@@ -26,16 +26,17 @@ int main() {
     msg result;
     
     int test_num = 100;
-    /*result = test_bi_add(test_num);
-    result = test_bi_sub(test_num);
-    result = test_bi_textbook_mulc(test_num);
-    result = test_bi_improved_textbook_mulc(test_num);
-    result = test_bi_karatsuba_mulc(test_num);
-    result = test_bi_mul(test_num);
-    result = test_bi_long_div(test_num);
-    result = test_bi_div(test_num);*/
-    result = test_bi_barrett_reduction(test_num);
+    // result = test_bi_add(test_num);
+    // result = test_bi_sub(test_num);
+    // result = test_bi_textbook_mulc(test_num);
+    // result = test_bi_improved_textbook_mulc(test_num);
+    // result = test_bi_karatsuba_mulc(test_num);
+    // result = test_bi_mul(test_num);
+    // result = test_bi_long_div(test_num);
+    // result = test_bi_div(test_num);
+    // result = test_bi_barrett_reduction(test_num);
     result = test_bi_l2r_modular_exp(test_num);
+    result = test_bi_r2l_modular_exp(test_num);
 
     bi_delete(&A);
     bi_delete(&B);

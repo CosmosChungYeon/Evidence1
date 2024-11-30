@@ -6,6 +6,7 @@
 #include "msg.h"
 #include "const.h"
 #include "array_func.h"
+#include "calc_operations.h"
 
 msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const word* a) {
 
@@ -175,7 +176,7 @@ msg bi_print(IN const bigint* dst, IN int base) {
     }
 
     /* 진수값 체크 */
-    if (base != 2 && base != 16) {
+    if (base != 2 && base != 16 && base != 10) {
         fprintf(stderr, UnSupportBaseErrMsg);
         return UnSupportBaseErr;
     }
@@ -229,6 +230,7 @@ msg bi_print(IN const bigint* dst, IN int base) {
             printf("0");
         }
     }
+
     return CLEAR;
 }
 
@@ -240,7 +242,7 @@ msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base) {
     }
 
     /* 진수값 체크 */
-    if (base != 2 && base != 16) {
+    if (base != 2 && base != 16 && base != 10) {
         fprintf(stderr, UnSupportBaseErrMsg);
         return UnSupportBaseErr;
     }
@@ -294,6 +296,7 @@ msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base) {
             fprintf(file, "0");
         }
     }
+    
     return CLEAR;
 }
 

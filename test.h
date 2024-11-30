@@ -13,5 +13,5 @@ msg test_bi_long_div(int test_num);
 msg test_bi_div(int test_num);
 msg test_bi_barrett_reduction(int test_num);
 msg test_bi_l2r_modular_exp(int test_num);
-
+msg test_bi_r2l_modular_exp(int test_num);
 #endif  // TEST_H

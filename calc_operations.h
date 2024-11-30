@@ -99,7 +99,7 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
  * @param[in] B 두 번째 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-msg bi_improved_textbook_mulc(bigint **C, bigint **A, bigint **B);
+msg bi_improved_textbook_mulc(bigint** C, bigint** A, bigint** B);
 
 /**
  * @brief karatsuba 곱셈
@@ -143,6 +143,38 @@ msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
  */
 msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
 
+/**
+ * @brief left to right modular exponentiation (C = X^N mod M)
+ *
+ * @param[out] C 결과 큰 정수의 이중 포인터
+ * @param[in] X 대상 큰 정수의 이중 포인터
+ * @param[in] N 지수 큰 정수의 이중 포인터
+ * @param[in] M modular 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+msg bi_l2r_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+
+/**
+ * @brief right to left modular exponentiation (C = X^N mod M)
+ *
+ * @param[out] C 결과 큰 정수의 이중 포인터
+ * @param[in] X 대상 큰 정수의 이중 포인터
+ * @param[in] N 지수 큰 정수의 이중 포인터
+ * @param[in] M modular 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+msg bi_r2l_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+
+/**
+ * @brief barrett reduction (A의 워드 길이 = N의 워드 길이의 두 배)
+ *
+ * @param[out] R reduction 결과 큰 정수의 이중 포인터
+ * @param[in] A reduction 대상 큰 정수의 이중 포인터
+ * @param[in] N modular 큰 정수의 이중 포인터
+ * @param[in] T 사전 계산 가능한 값 큰 정수의 이중 포인터
+ * @return 성공 실패 여부 반환
+ */
+// 한계: word 8bit 시 test에서 워드 길이가 A 또는 N이 1씩 감소해서 에러 발생
 msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
 
 #endif  // CALC_OPERATIONS_H

@@ -672,3 +672,74 @@ msg test_bi_l2r_modular_exp(int test_num) {
     printf("l2r_modular_exp[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
     return CLEAR;
 }
+
+msg test_bi_r2l_modular_exp(int test_num) {
+    double exec_time = 0;
+    FILE* file = fopen("bi_r2l_modular_exp_test_output.txt", "w");
+    if (file == NULL) {
+        fprintf(stderr, FileErrorMsg);
+        return FileError;
+    }
+    fprintf(file, "fail_cnt = 0\n");
+
+    for (int i = 0; i < test_num; i++) {
+        bigint* C = NULL;
+        bigint* X = NULL;
+        bigint* N = NULL;
+        bigint* M = NULL;
+       
+        msg result;
+
+        int X_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        int N_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        int M_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+
+        result = bi_get_random(&X, X_word_len);
+        result = bi_get_random(&N, N_word_len);
+        result = bi_get_random(&M, M_word_len);
+
+        X->sign = NON_NEGATIVE;
+        N->sign = NON_NEGATIVE;
+        M->sign = NON_NEGATIVE;
+
+        fprintf(file, "X = ");
+        bi_fprint(file, X, 16);
+        fprintf(file, "\n");
+        fprintf(file, "N = ");
+        bi_fprint(file, N, 16);
+        fprintf(file, "\n");
+        fprintf(file, "M = ");
+        bi_fprint(file, M, 16);
+        fprintf(file, "\n");
+
+        clock_t start, end;
+        start = clock();
+
+        result = bi_r2l_modular_exp(&C, &X, &N, &M);
+
+        end = clock();
+        double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        fprintf(file, "C = pow(X, N, M)\n");
+        fprintf(file, "if (C != ");
+        bi_fprint(file, C, 16);
+        fprintf(file, "):\n");
+        fprintf(file, "    print('C = ', hex(C))\n");
+        fprintf(file, "    print('wrong C = ', hex(");
+        bi_fprint(file, C, 16);
+        fprintf(file, "))\n");
+        fprintf(file, "    fail_cnt = fail_cnt + 1\n");
+
+        bi_delete(&C);
+        bi_delete(&X);
+        bi_delete(&N);
+        bi_delete(&M);
+
+        exec_time += duration;
+    }
+    fprintf(file, "print(fail_cnt)\n");
+    fclose(file);
+
+    printf("r2l_modular_exp[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
+    return CLEAR;
+}

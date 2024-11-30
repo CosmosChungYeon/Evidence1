@@ -15,20 +15,11 @@ msg array_init(UPDATE word* a, int IN word_len) {
 
 
 msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
-    //if (dst != NULL){                           // NULL이 아니면 메모리 해제
-    //	free(dst);
-    //}
-
-    //dst = (word*)calloc(word_len, sizeof(word));    // src의 word_len만큼 메모리 할당
-    //if (dst == NULL){
-    //	fprintf(stderr, MemAllocErrMsg);
-    //	return MemAllocErr;
-    //}
 
     for (int i = 0; i < word_len; i++) {            // src 배열의 내용을 dst 배열로 복사
         dst[i] = src[i];
     }
-    
+
     return CLEAR;
 }
 
