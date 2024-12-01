@@ -14,6 +14,7 @@
                 "${fileDirname}/basic_func.c",
                 "${fileDirname}/main.c",
                 "${fileDirname}/calc_operations.c",
+                "${fileDirname}/DH.c",
 
                 "-o",
                 "${fileDirname}/main.exe"
@@ -48,6 +49,7 @@
                 "${fileDirname}/basic_func.c",
                 "${fileDirname}/main.c",
                 "${fileDirname}/calc_operations.c",
+                "${fileDirname}/DH.c",
 
                 "-o",
                 "${fileDirname}\\main.exe"

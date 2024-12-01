@@ -16,27 +16,6 @@ msg bi_add_ABc(OUT word* C, IN word* A, IN word* B, IN int c) {
     return c_out;   // c' 반환
 }
 
-/* bi_add에서는 잘 되고, bi_textbook_mul에서는 안 되는 addc */
-//msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
-//    /* [n >= m] */
-//    int n = (*A)->word_len;
-//    int m = (*B)->word_len;
-//
-//
-//    /* carry 연산하면서 A + B 수행 */
-//
-//    int c = 0;
-//    for (int j = 0; j < n; j++) {
-//        word b_value = (j < m) ? (*B)->a[j] : 0;
-//        c = bi_add_ABc(&((*C)->a[j]), &((*A)->a[j]), &b_value, c);
-//    }
-//    if (c == CARRY1) {
-//        (*C)->a[n] = CARRY1;
-//    }
-// 
-//    return bi_refine(*C);
-//}
-
 msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     /* [n >= m] */
     int n = (*A)->word_len;
@@ -762,4 +741,6 @@ msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint
     }
     bi_delete(&Q_hat);
     bi_delete(&A_tmp);
+
+    return CLEAR;
 }
