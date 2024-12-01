@@ -36,7 +36,8 @@ typedef uint64_t        word;
 #else
 #pragma message(UnSupportWordBitLenErrMsg) // 지원하지 않는 word bitlen
 typedef uint32_t        word;
-#define WORD_MASK       0xFFFF
+#define WORD_MASK       0x0000FFFF
+#define MSB_BIT_MASK	0x80000000
 #define FORMAT          "%08x"
 #define TEST_WORD_LEN   32
 #endif
