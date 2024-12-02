@@ -152,7 +152,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
  * @param[in] M modular 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-msg bi_l2r_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
 
 /**
  * @brief right to left modular exponentiation (C = X^N mod M)
@@ -163,7 +163,7 @@ msg bi_l2r_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint**
  * @param[in] M modular 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-msg bi_r2l_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
 
 /**
  * @brief barrett reduction (A의 워드 길이 = N의 워드 길이의 두 배)
@@ -175,6 +175,6 @@ msg bi_r2l_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint**
  * @return 성공 실패 여부 반환
  */
 // 한계: word 8bit 시 test에서 워드 길이가 A 또는 N이 1씩 감소해서 에러 발생
-msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
+msg bi_barrett_red(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
 
 #endif  // CALC_OPERATIONS_H

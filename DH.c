@@ -13,9 +13,9 @@ msg bi_dh_private_key_gen(OUT bigint** key, IN bigint** p) {
 }
 
 msg bi_dh_public_key_gen(OUT bigint** gA, IN bigint** g, IN bigint** key, IN bigint** p) {
-    bi_l2r_modular_exp(gA, g, key, p);
+    bi_l2r_mod_exp(gA, g, key, p);
 }
 
 msg bi_dh_session_key_gen(OUT bigint** gAB, IN bigint** gB, IN bigint** key, IN bigint** p) {
-    bi_l2r_modular_exp(gAB, gB, key, p);
+    bi_l2r_mod_exp(gAB, gB, key, p);
 }

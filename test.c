@@ -520,7 +520,7 @@ msg test_bi_div(int test_num) {
     return CLEAR;
 }
 
-msg test_bi_barrett_reduction(int test_num) {
+msg test_bi_barrett_red(int test_num) {
     double exec_time = 0;
     FILE* file = fopen("bi_barrett_reduction_test_output.txt", "w");
     if (file == NULL) {
@@ -566,7 +566,7 @@ msg test_bi_barrett_reduction(int test_num) {
 
         clock_t start, end;
         start = clock();
-        result = bi_barrett_reduction(&R, &A, &N, &T);
+        result = bi_barrett_red(&R, &A, &N, &T);
 
         end = clock();
         double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -602,7 +602,7 @@ msg test_bi_barrett_reduction(int test_num) {
     return CLEAR;
 }
 
-msg test_bi_l2r_modular_exp(int test_num) {
+msg test_bi_l2r_mod_exp(int test_num) {
     double exec_time = 0;
     FILE* file = fopen("bi_l2r_modular_exp_test_output.txt", "w");
     if (file == NULL) {
@@ -644,7 +644,7 @@ msg test_bi_l2r_modular_exp(int test_num) {
         clock_t start, end;
         start = clock();
 
-        result = bi_l2r_modular_exp(&C, &X, &N, &M);
+        result = bi_l2r_mod_exp(&C, &X, &N, &M);
 
         end = clock();
         double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -673,7 +673,7 @@ msg test_bi_l2r_modular_exp(int test_num) {
     return CLEAR;
 }
 
-msg test_bi_r2l_modular_exp(int test_num) {
+msg test_bi_r2l_mod_exp(int test_num) {
     double exec_time = 0;
     FILE* file = fopen("bi_r2l_modular_exp_test_output.txt", "w");
     if (file == NULL) {
@@ -715,7 +715,7 @@ msg test_bi_r2l_modular_exp(int test_num) {
         clock_t start, end;
         start = clock();
 
-        result = bi_r2l_modular_exp(&C, &X, &N, &M);
+        result = bi_r2l_mod_exp(&C, &X, &N, &M);
 
         end = clock();
         double duration = ((double)(end - start)) / CLOCKS_PER_SEC;

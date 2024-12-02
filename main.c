@@ -35,9 +35,10 @@ int main() {
     //result = test_bi_mul(test_num);
     //result = test_bi_long_div(test_num);
     //result = test_bi_div(test_num);
-    //result = test_bi_barrett_reduction(test_num);
-    //result = test_bi_l2r_modular_exp(test_num);
-    //result = test_bi_r2l_modular_exp(test_num);
+    //result = test_bi_l2r_mod_exp(test_num);
+    //result = test_bi_r2l_mod_exp(test_num);
+    //result = test_bi_barrett_red(test_num);
+
 
     bigint* p = NULL;
     bigint* g = NULL;

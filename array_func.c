@@ -3,7 +3,7 @@
 #include "array_func.h"
 #include "msg.h"
 
-msg array_init(UPDATE word* a, int IN word_len) {
+msg array_init(UPDATE word* a, IN int word_len) {
     memset(a, 0, WORD_ARR_BYTELEN(word_len));   // array a의 길이만큼 0으로 초기화 (바이트단위)
     word result = 0;                            // 초기화 확인
     for (int i = 0; i < word_len; i++) {

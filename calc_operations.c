@@ -603,7 +603,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     return CLEAR;
 }
 
-msg bi_l2r_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
+msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
     
     if ((*X == NULL) || (*M == NULL)) {
         fprintf(stderr, DSTpNULLErrMsg);
@@ -651,7 +651,7 @@ msg bi_l2r_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint**
     return CLEAR;
 }
 
-msg bi_r2l_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
+msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
     
     if ((*X == NULL) || (*M == NULL)) {
         fprintf(stderr, DSTpNULLErrMsg);
@@ -696,7 +696,7 @@ msg bi_r2l_modular_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint**
     return CLEAR;
 }
 
-msg bi_barrett_reduction(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T) {
+msg bi_barrett_red(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T) {
     /* 워드 길이 저장 */
     unsigned int n = (*N)->word_len;
     unsigned int double_n = (*A)->word_len;

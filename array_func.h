@@ -11,7 +11,7 @@
  * @param[in] word_len 배열의 길이
  * @return 초기화 여부 반환 (성공: CLEAR, 실패: NOTInitErr)
  */
-msg array_init(UPDATE word* a, int IN word_len);
+msg array_init(UPDATE word* a, IN int word_len);
 
 /**
  * @brief src 배열을 대상 배열로 배열 복사
