@@ -131,4 +131,10 @@ msg bi_word_shift_right(UPDATE bigint** T, IN int shift_words);
  */
 msg bi_doubling(UPDATE bigint* X);
 
+msg bi_plus_one(UPDATE bigint** dst);
+
+msg bi_zero_check(IN bigint** src);
+
+msg bi_set_one(UPDATE bigint** dst);
+
 #endif  // BASIC_FUNC_H

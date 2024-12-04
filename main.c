@@ -11,7 +11,7 @@
 #include "bi_def.h"
 #include "msg.h"
 #include "test.h"
-#include "dh.h"
+#include "DH.h"
 
 #include "const.h"
 
@@ -25,54 +25,54 @@ int main() {
     bigint* R = NULL;
 
     msg result;
-    
+
     int test_num = 100;
-    //result = test_bi_add(test_num);
-    //result = test_bi_sub(test_num);
-    //result = test_bi_textbook_mulc(test_num);
-    //result = test_bi_improved_textbook_mulc(test_num);
-    //result = test_bi_karatsuba_mulc(test_num);
-    //result = test_bi_mul(test_num);
-    //result = test_bi_long_div(test_num);
-    //result = test_bi_div(test_num);
-    //result = test_bi_l2r_mod_exp(test_num);
-    //result = test_bi_r2l_mod_exp(test_num);
-    //result = test_bi_barrett_red(test_num);
+    result = test_bi_add(test_num);
+    result = test_bi_sub(test_num);
+    result = test_bi_textbook_mulc(test_num);
+    result = test_bi_improved_textbook_mulc(test_num);
+    result = test_bi_karatsuba_mulc(test_num);
+    result = test_bi_mul(test_num);
+    result = test_bi_long_div(test_num);
+    result = test_bi_div(test_num);
+    result = test_bi_barrett_red(test_num);
+    result = test_bi_l2r_mod_exp(test_num);
+    result = test_bi_r2l_mod_exp(test_num);
+
+    result = bi_delete(&A);
+    result = bi_delete(&B);
+    result = bi_delete(&C);
+    result = bi_delete(&Q);
+    result = bi_delete(&R);
 
 
-    bigint* p = NULL;
+    /*bigint* p = NULL;
     bigint* g = NULL;
     bigint* gA = NULL;
     bigint* gB = NULL;
     bigint* gAB = NULL;
     bigint* key = NULL;
 
-    bi_set_from_string(&p, "23", 16);
-    bi_set_from_string(&g, "5", 16);
-    bi_set_from_string(&gB, "13", 16);
-    bi_dh_private_key_gen(&key, &p);
-    bi_dh_public_key_gen(&gA, &g, &key, &p);
-    bi_dh_session_key_gen(&gAB, &gB, &key, &p);
-    
-    printf("k = "); bi_print(key, 16); printf("\n");
-    printf("p = "); bi_print(p, 16); printf("\n");
-    printf("g = "); bi_print(g, 16); printf("\n");
-    printf("gA = "); bi_print(gA, 16); printf("\n");
-    printf("B = "); bi_print(gB, 16); printf("\n");
-    printf("gAB = "); bi_print(gAB, 16); printf("\n");
+    result = bi_set_from_string(&p, "23", 16);
+    result = bi_set_from_string(&g, "5", 16);
+    result = bi_set_from_string(&gB, "13", 16);
+    result = bi_dh_private_key_gen(&key, &p);
+    result = bi_dh_public_key_gen(&gA, &g, &key, &p);
+    result = bi_dh_session_key_gen(&gAB, &gB, &key, &p);
 
-    bi_delete(&A);
-    bi_delete(&B);
-    bi_delete(&C);
-    bi_delete(&Q);
-    bi_delete(&R);
+    printf("k = "); result = bi_print(key, 16); printf("\n");
+    printf("p = "); result = bi_print(p, 16); printf("\n");
+    printf("g = "); result = bi_print(g, 16); printf("\n");
+    printf("gA = "); result = bi_print(gA, 16); printf("\n");
+    printf("B = "); result = bi_print(gB, 16); printf("\n");
+    printf("gAB = "); result = bi_print(gAB, 16); printf("\n");
 
-    bi_delete(&p);
-    bi_delete(&g);
-    bi_delete(&gA);
-    bi_delete(&gB);
-    bi_delete(&gAB);
-    bi_delete(&key);
+    result = bi_delete(&p);
+    result = bi_delete(&g);
+    result = bi_delete(&gA);
+    result = bi_delete(&gB);
+    result = bi_delete(&gAB);
+    result = bi_delete(&key);*/
 
     return 0;
 }

@@ -5,47 +5,49 @@
 #include "bi_def.h"
 #include "const.h"
 
-msg bi_add_ABc(OUT word* C, IN word* A, IN word* B, IN int c) {
-    int c_out = 0;  // 반환용 carry(c')
-    *C = *A + *B;
-    c_out = (*C < *A) ? CARRY1 : CARRY0;     // if A + B < A, then c' = 1
+msg bi_add_ABc(OUT word* result, IN word* op1, IN word* op2, IN int carry_in) {
+    int carry_out = 0; // Carry out (c')
 
-    *C += c;
-    c_out = (*C < c) ? c_out + 1 : c_out;   // if A + B + c < c, then c' += 1 
+    // Add op1 and op2
+    *result = *op1 + *op2;
+    carry_out = (*result < *op1) ? CARRY1 : CARRY0; // Check for carry: if op1 + op2 < op1, carry = 1
 
-    return c_out;   // c' 반환
+    // Add the input carry
+    *result += carry_in;
+    carry_out += (*result < carry_in) ? CARRY1 : CARRY0; // If result + carry_in < carry_in, additional carry
+
+    return carry_out; // Return the carry out
 }
 
-msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B) {
-    /* [n >= m] */
-    int n = (*A)->word_len;
-    int m = (*B)->word_len;
+msg bi_addc(OUT bigint** result, IN bigint** op1, IN bigint** op2) {
+    // Ensure op1 has more or equal word length (n >= m)
+    int len_op1 = (*op1)->word_len;
+    int len_op2 = (*op2)->word_len;
 
-    /* tmp 초기화 */
-    bigint* tmp = NULL;
-    bi_new(&tmp, n + 1);  // +1 워드는 최종 carry를 위한 공간
+    // Initialize a temporary bigint to store the result, with extra space for the final carry
+    bigint* tmp_result = NULL;
+    bi_new(&tmp_result, len_op1 + 1); // +1 word for the final carry
 
-    /* carry 연산하면서 A + B 수행 */
-    int c = 0;
-    for (int j = 0; j < n; j++) {
-        word a_value = (*A)->a[j];
-        word b_value = (j < m) ? (*B)->a[j] : 0;
+    // Perform addition word by word with carry propagation
+    int carry = 0;
+    for (int i = 0; i < len_op1; i++) {
+        word val_op1 = (*op1)->a[i];
+        word val_op2 = (i < len_op2) ? (*op2)->a[i] : 0; // Use 0 if op2 is shorter
 
-        c = bi_add_ABc(&(tmp->a[j]), &a_value, &b_value, c);
+        carry = bi_add_ABc(&(tmp_result->a[i]), &val_op1, &val_op2, carry);
     }
 
-    /* 마지막 carry 처리 */
-    tmp->a[n] = (c == CARRY1) ? CARRY1 : CARRY0;
+    // Handle the final carry
+    tmp_result->a[len_op1] = (carry == CARRY1) ? CARRY1 : CARRY0;
 
-    /* C를 삭제하기 때문에 둘다 sign일 경우 음수로 지정 */
-    tmp->sign = ((*A)->sign == NEGATIVE && (*B)->sign == NEGATIVE) ? NEGATIVE : NON_NEGATIVE;
+    // Set the sign of the result
+    tmp_result->sign = ((*op1)->sign == NEGATIVE && (*op2)->sign == NEGATIVE) ? NEGATIVE : NON_NEGATIVE;
 
-    // 결과를 `C`에 복사
-    bi_assign(C, tmp);
+    // Assign the result to the output and clean up temporary memory
+    bi_assign(result, tmp_result);
+    bi_delete(&tmp_result);
 
-    // 메모리 해제
-    bi_delete(&tmp);
-    return bi_refine(*C);
+    return bi_refine(*result); // Refine the result to ensure proper formatting
 }
 
 msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B) {
@@ -58,64 +60,78 @@ msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int m = (*B)->word_len;
     int max_word_len = (n > m) ? n + 1 : m + 1;
 
-    bi_new(C, max_word_len);
+    bigint* tmp = NULL;
+    bi_new(&tmp, max_word_len);
 
     if ((*A)->sign != (*B)->sign) {
         // A > 0 and B < 0 
         if ((*A)->sign == NON_NEGATIVE) {
             (*B)->sign = NON_NEGATIVE;
-            msg result = bi_sub(C, A, B);
+            bi_sub(&tmp, A, B);
             (*B)->sign = NEGATIVE;
-            return result;
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
         // A < 0 and B > 0 
         else {
             (*A)->sign = NON_NEGATIVE;
-            msg result = bi_sub(C, B, A);
+            bi_sub(&tmp, B, A);
             (*A)->sign = NEGATIVE;
-            return result;
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
     }
 
     /* 부호가 같은 경우 */
-    (*C)->sign = (*A)->sign;
+    (tmp)->sign = (*A)->sign;
 
     // wordlen A >= wordlen B
     if (n >= m) {
-        return bi_addc(C, A, B);
+        bi_addc(&tmp, A, B);
+        bi_assign(C, tmp);
+        bi_delete(&tmp);
+        return bi_refine(*C);
     }
     else {
-        return bi_addc(C, B, A);
+        bi_addc(&tmp, B, A);
+        bi_assign(C, tmp);
+        bi_delete(&tmp);
+        return bi_refine(*C);
     }
 
+    // bi_delete(&tmp);
     return bi_refine(*C);
 }
 
-msg bi_sub_AbB(OUT word* C, IN word* A, IN int b, IN word* B) {
-    int b_out = 0;  // 반환용 borrow(b')
-    *C = *A - b;
-    b_out = (*A < b) ? BORROW1 : BORROW0;    // if A < b, then b' = 1
+msg bi_sub_AbB(OUT word* result, IN word* op1, IN int borrow_in, IN word* op2) {
+    int borrow_out = 0;  // Borrow output (b')
 
-    b_out = (*C < *B) ? b_out + 1 : b_out;   // if C < B, then b' += 1 
-    *C -= *B;
+    *result = *op1 - borrow_in;  // Subtract the borrow from the op1
+    borrow_out = (*op1 < borrow_in) ? BORROW1 : BORROW0;  // If op1 < borrow_in, set borrow_out to 1
 
-    return b_out;   // b' 반환
+    // If result < op2, update borrow_out and subtract op2
+    borrow_out = (*result < *op2) ? borrow_out + 1 : borrow_out;
+    *result -= *op2;
+
+    return borrow_out;  // Return the borrow output
 }
 
-msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B) {
-    /* [n >= m] */
-    int n = (*A)->word_len;
-    int m = (*B)->word_len;
+msg bi_subc(OUT bigint** result, IN bigint** op1, IN bigint** op2) {
+    int len_op1 = (*op1)->word_len;
+    int len_op2 = (*op2)->word_len;
 
-    /* borrow 연산하면서 A - B 수행 */
-    int b = 0;
-    for (int j = 0; j < n; j++) {
-        word a_value = (*A)->a[j];
-        word b_value = (j < m) ? (*B)->a[j] : 0;
-        b = bi_sub_AbB(&((*C)->a[j]), &a_value, b, &b_value);
+    // Perform subtraction with borrow
+    int borrow = 0;
+    for (int j = 0; j < len_op1; j++) {
+        word val_op1 = (*op1)->a[j];
+        word val_op2 = (j < len_op2) ? (*op2)->a[j] : 0;
+
+        borrow = bi_sub_AbB(&((*result)->a[j]), &val_op1, borrow, &val_op2);
     }
 
-    return bi_refine(*C);
+    return bi_refine(*result);  // Refine the result to adjust word length
 }
 
 msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
@@ -128,7 +144,8 @@ msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int m = (*B)->word_len;
     int max_word_len = (n > m) ? n + 1 : m + 1;
 
-    bi_new(C, max_word_len);
+    bigint* tmp = NULL;
+    bi_new(&tmp, max_word_len);
 
     int sign_A = (*A)->sign;
     int sign_B = (*B)->sign;
@@ -137,17 +154,21 @@ msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
         // A > 0, B < 0인 경우 (A - (-B) = A + B)
         if (sign_A == NON_NEGATIVE) {
             (*B)->sign = NON_NEGATIVE;  // B를 양수로 변경
-            msg result = bi_add(C, A, B);  // C = A + B
+            bi_add(&tmp, A, B);  // C = A + B
             (*B)->sign = sign_B;  // B의 부호를 원래대로 복원
-            return result;
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
         // A < 0, B > 0인 경우 (-A - B = -(A + B))
         else {
             (*A)->sign = NON_NEGATIVE;  // A를 양수로 변경
-            msg result = bi_add(C, A, B);  // C = A + B
+            bi_add(&tmp, A, B);  // C = A + B
             (*A)->sign = sign_A;  // A의 부호를 원래대로 복원
-            (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
-            return result;
+            (tmp)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
     }
 
@@ -155,13 +176,19 @@ msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
     // A > 0, B > 0인 경우
     if (sign_A == NON_NEGATIVE && sign_B == NON_NEGATIVE) {
         if (bi_compare(A, B) == COMPARE_GREATER) {
-            return bi_subc(C, A, B);  // A > B일 때 C = A - B
+            bi_subc(&tmp, A, B);  // A > B일 때 C = A - B
+            (tmp)->sign = NON_NEGATIVE;
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
         else {
             // A < B인 경우 C = B - A, 결과 부호는 음수로 설정
-            msg result = bi_subc(C, B, A);
-            (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
-            return result;
+            bi_subc(&tmp, B, A);
+            (tmp)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
     }
 
@@ -169,13 +196,19 @@ msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
     if (sign_A == NEGATIVE && sign_B == NEGATIVE) {
         if (bi_compare(A, B) == COMPARE_GREATER) {
             // A > B일 경우 C = B - A, 결과 부호는 양수로 설정
-            return bi_subc(C, B, A);
+            bi_subc(&tmp, B, A);
+            (tmp)->sign = NON_NEGATIVE;
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
         else {
             // A < B일 경우 C = A - B, 결과 부호는 음수로 설정
-            msg result = bi_subc(C, A, B);
-            (*C)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
-            return result;
+            bi_subc(&tmp, A, B);
+            (tmp)->sign = NEGATIVE;  // 결과 부호를 음수로 설정
+            bi_assign(C, tmp);
+            bi_delete(&tmp);
+            return bi_refine(*C);
         }
     }
 
@@ -185,9 +218,9 @@ msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B) {
 msg bi_mul_AB(OUT word C[2], IN word* A, IN word* B) {
     /* 하나의 워드를 두 개로 나눔 */
     /* 상위비트(A1, B1)와 하위비트(A0, B0)로 나눔 */
-    word A1 = *A >> (WORD_BITLEN / 2);
+    word A1 = *A >> (WORD_BITLEN >> 1);
     word A0 = *A & WORD_MASK;
-    word B1 = *B >> (WORD_BITLEN / 2);
+    word B1 = *B >> (WORD_BITLEN >> 1);
     word B0 = *B & WORD_MASK;
 
     /* A1B0 + A0B1 = A1B0 + A0B1 + carry */
@@ -205,8 +238,8 @@ msg bi_mul_AB(OUT word C[2], IN word* A, IN word* B) {
 
     /* C0: 두 개의 워드에서 하위 비트 */
     /* C1: 두 개의 워드에서 상위 비트 */
-    C0 = C0 + (T0 << (WORD_BITLEN / 2));
-    C1 = C1 + (T1 << (WORD_BITLEN / 2)) + (T0 >> (WORD_BITLEN / 2)) + (C0 < T);
+    C0 = C0 + (T0 << (WORD_BITLEN >> 1));
+    C1 = C1 + (T1 << (WORD_BITLEN >> 1)) + (T0 >> (WORD_BITLEN >> 1)) + (C0 < T);
 
     C[1] = C1;
     C[0] = C0;
@@ -218,46 +251,41 @@ msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int n = (*A)->word_len;
     int m = (*B)->word_len;
 
-    msg result;
+    // 결과 저장용 bigint 초기화
+    bigint* tmp = NULL;
+    bi_new(&tmp, n + m); // 최대 길이 n+m을 가지는 bigint 생성
 
-    /* 워드 길이 2로 초기화 */
-    bi_new(C, 2);
+    // 각 Aj*Bi 결과를 저장할 임시 bigint
+    bigint* T = NULL;
 
-    /* Aj*Bi 단일 워드 곱셈의 합 */
+    // 모든 곱셈 연산 처리
     for (int Aj = 0; Aj < n; Aj++) {
         for (int Bi = 0; Bi < m; Bi++) {
-            /* 단일 워드 곱셈 저장 */
-            bigint* T = NULL;
-            result = bi_new(&T, 2);
-            result = bi_mul_AB(T->a, &((*A)->a[Aj]), &((*B)->a[Bi]));
+            bi_new(&T, 2); // 한 번만 생성
+            // Aj와 Bi의 곱셈 
+            bi_mul_AB(T->a, &((*A)->a[Aj]), &((*B)->a[Bi]));
 
-            /* Aj + Bi만큼 left shift */
+            // 곱셈 결과를 올바른 위치에 더하기
             bi_word_shift_left(&T, Aj + Bi);
-
-            /* 2 + Aj + Bi에 carry 발생을 고려하여 C의 워드 길이 1 증가 */
-            int required_len = 2 + Aj + Bi + CARRY1;
-            if ((*C)->word_len < required_len) {
-                // bigint의 배열 확장
-                word* temp = (word*)realloc((*C)->a, required_len * sizeof(word));
-                if (temp == NULL) {
-                    fprintf(stderr, MemAllocErrMsg);
-                    return MemAllocErr;
-                }
-                (*C)->a = temp;
-
-                /* 새로 확장된 부분을 0으로 초기화 */
-                memset((*C)->a + (*C)->word_len, 0, (required_len - (*C)->word_len) * sizeof(word));
-                (*C)->word_len = required_len;
+            if (T->word_len < tmp->word_len) {
+                bi_addc(&tmp, &tmp, &T);
             }
-
-            /* C = C + T */
-            result = bi_addc(C, C, &T);
-
-            bi_delete(&T);
+            else {
+                bi_addc(&tmp, &T, &tmp);
+            }
         }
     }
+
+    // 최종 결과 C에 할당 및 반환
+    bi_assign(C, tmp);
+
+    // 임시 변수 메모리 해제
+    bi_delete(&T);
+    bi_delete(&tmp);
+
     return bi_refine(*C);
 }
+
 
 msg bi_improved_textbook_mulc(bigint** C, bigint** A, bigint** B) {
 
@@ -291,61 +319,51 @@ msg bi_improved_textbook_mulc(bigint** C, bigint** A, bigint** B) {
     int m = (*B)->word_len;
 
     /* 결과 큰 정수 C 초기화 */
-    bi_new(C, n + m);
+    bigint *tmp = NULL;
+    bi_new(&tmp, n + m);
 
     bigint* T0 = NULL, * T1 = NULL, * T = NULL;
     bigint* temp0 = NULL, * temp1 = NULL;
+    bi_new(&temp0, 2);
+    bi_new(&temp1, 2);
+    bi_new(&T, n + 2);
+
     /* 주어진 알고리즘대로 모든 조합의 곱셈을 수행 */
     for (int i = 0; i < m; i++) {
         bi_new(&T0, n);
         bi_new(&T1, n);
+        for (int j= 0; j < n; j += 2) {
+            
+            bi_mul_AB(temp0->a, &((*A)->a[j]), &((*B)->a[i]));
+            bi_mul_AB(temp1->a, &((*A)->a[j + 1]), &((*B)->a[i]));
+            T0->a[j] += temp0->a[0];
+            T0->a[j + 1] += temp0->a[1];
 
-        for (int k = 0; k < n; k += 2) {
-            bi_new(&temp0, 2);
-            bi_new(&temp1, 2);
-            bi_mul_AB(temp0->a, &((*A)->a[k]), &((*B)->a[i]));
-            bi_mul_AB(temp1->a, &((*A)->a[k + 1]), &((*B)->a[i]));
-            T0->a[k] += temp0->a[0];
-            T0->a[k + 1] += temp0->a[1];
-
-            T1->a[k] += temp1->a[0];
-            T1->a[k + 1] += temp1->a[1];
-
-            /* 초기화 */
-            bi_delete(&temp0);
-            bi_delete(&temp1);
+            T1->a[j] += temp1->a[0];
+            T1->a[j + 1] += temp1->a[1];
         }
-
+  
         // T0과 T1을 합치고, 필요한 만큼 비트 시프트를 적용합니다.
-        bi_new(&T, n + 2);
         bi_word_shift_left(&T1, 1); // 시프트 적용
         bi_addc(&T, &T1, &T0); // T = T0 + T1
         bi_word_shift_left(&T, i); // 시프트 적용
-        bi_addc(C, C, &T);  // C = C + T
-
-        /* C에서 carry 발생을 고려하여 C의 워드 길이 1 증가 */
-        int required_len = n + m;
-        if ((*C)->word_len < required_len) {
-            // bigint의 배열 확장
-            word* temp = (word*)realloc((*C)->a, required_len * sizeof(word));
-            if (temp == NULL) {
-                fprintf(stderr, MemAllocErrMsg);
-                return MemAllocErr;
-            }
-            (*C)->a = temp;
-
-            /* 새로 확장된 부분을 0으로 초기화 */
-            memset((*C)->a + (*C)->word_len, 0, (required_len - (*C)->word_len) * sizeof(word));
-            (*C)->word_len = required_len;
+        if (T->word_len < tmp->word_len){
+            bi_addc(&tmp, &tmp, &T);
         }
-
-
-        /* 초기화 */
-        bi_delete(&T0);
-        bi_delete(&T1);
-        bi_delete(&T);
+        else{
+            bi_addc(&tmp, &T ,&tmp);
+        }
     }
 
+    /* 초기화 */
+    bi_delete(&T0);
+    bi_delete(&T1); 
+    bi_delete(&temp0);
+    bi_delete(&temp1);
+    bi_delete(&T);
+
+    bi_assign(C, tmp);
+    bi_delete(&tmp);
     return bi_refine(*C); // C의 불필요한 leading zeros 제거
 }
 
@@ -358,7 +376,7 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     int min_len = (n > m) ? m : n;
 
     /* 둘 중 하나가 0이면 0 반환 */
-    if (((n == 1) && ((*A)->a[0] == 0)) || ((m == 1) && ((*B)->a[0] == 0))) {
+    if (bi_zero_check(A) || bi_zero_check(B)) {
         bi_new(C, 1);
         (*C)->a[0] = 0;
         return CLEAR;
@@ -378,51 +396,15 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     bigint* T_tmp = NULL;
     bigint* S1 = NULL, * S0 = NULL;
     bigint* S = NULL;
-    bigint* S_sum1 = NULL, * S_sum2 = NULL;
-    bigint* C_tmp = NULL;
+    bigint *tmp = NULL;
+    bi_new(&tmp, n + m);
 
     bi_new(&A1, lw_len); bi_new(&A0, lw_len);
     bi_new(&B1, lw_len); bi_new(&B0, lw_len);
-
-    // A1: 상위 부분 복사
-    for (int i = 0; i < A1->word_len; i++) {
-        if (i + lw_len < n) {
-            A1->a[i] = (*A)->a[i + lw_len];
-        }
-        else {
-            A1->a[i] = 0;  // 나머지는 0으로 채움
-        }
-    }
-
-    // A0: 하위 부분 복사
-    for (int i = 0; i < lw_len; i++) {
-        if (i < n) {
-            A0->a[i] = (*A)->a[i];
-        }
-        else {
-            A0->a[i] = 0;  // 나머지는 0으로 채움
-        }
-    }
-
-    // B1: 상위 부분 복사
-    for (int i = 0; i < B1->word_len; i++) {
-        if (i + lw_len < m) {
-            B1->a[i] = (*B)->a[i + lw_len];
-        }
-        else {
-            B1->a[i] = 0;  // 나머지는 0으로 채움
-        }
-    }
-
-    // B0: 하위 부분 복사
-    for (int i = 0; i < lw_len; i++) {
-        if (i < m) {
-            B0->a[i] = (*B)->a[i];
-        }
-        else {
-            B0->a[i] = 0;  // 나머지는 0으로 채움
-        }
-    }
+    array_copy_high(A1->a, (*A)->a, lw_len, n);
+    array_copy_low(A0->a, (*A)->a, lw_len, n);
+    array_copy_high(B1->a, (*B)->a, lw_len, m);
+    array_copy_low(B0->a, (*B)->a, lw_len, m);
 
     /* A1*B1, A0*B0 */
     bi_karatsuba_mulc(&T1, &A1, &B1);
@@ -431,7 +413,7 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     /* C = (T1 << 2lw) + T0 */
     bi_assign(&T_tmp, T1);
     bi_word_shift_left(&T_tmp, 2 * lw_len);
-    bi_add(C, &T_tmp, &T0);
+    bi_add(&tmp, &T_tmp, &T0);
 
     /* S1 = A0 - A1 */
     /* S0 = B1 - B0 */
@@ -448,17 +430,16 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     S->sign = (sign_S1 ^ sign_S0) ? NEGATIVE : NON_NEGATIVE;
 
     /* S = S + T1 */
-    bi_add(&S_sum1, &S, &T1);
+    bi_add(&S, &S, &T1);
 
     /* S = S + T0 */
-    bi_add(&S_sum2, &S_sum1, &T0);
+    bi_add(&S, &S, &T0);
 
     /* S = S << lw */
-    bi_word_shift_left(&S_sum2, lw_len);
+    bi_word_shift_left(&S, lw_len);
 
     /* C = C + S */
-    bi_assign(&C_tmp, *C);
-    bi_add(C, &C_tmp, &S_sum2);
+    bi_add(C, &tmp, &S);
 
     bi_delete(&A1);
     bi_delete(&A0);
@@ -469,10 +450,8 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     bi_delete(&S);
     bi_delete(&T1);
     bi_delete(&T_tmp);
-    bi_delete(&S_sum1);
     bi_delete(&T0);
-    bi_delete(&S_sum2);
-    bi_delete(&C_tmp);
+    bi_delete(&tmp);
 
     return bi_refine(*C);
 }
@@ -492,7 +471,6 @@ msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B) {
     (*B)->sign = NON_NEGATIVE;
 
     /* 절댓값 곱셈 수행 */
-    //bi_improved_textbook_mulc(C, A, B);
     bi_karatsuba_mulc(C, A, B);
 
     /* 결과 부호 설정 */
@@ -513,7 +491,7 @@ msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     }
 
     /* Zero Divisor 체크 */
-    if (((*B)->word_len == 1) && ((*B)->a[0] == 0x0)) {
+    if (bi_zero_check(B)) {
         fprintf(stderr, ZeroDivisorErrMsg);
         return ZeroDivisorErr;
     }
@@ -537,28 +515,29 @@ msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
         }
 
         /* R >= B 체크 */
-        bigint* tmpB = NULL;
-        bigint* tmpR = NULL;
-        bi_assign(&tmpB, *B);
-        bi_assign(&tmpR, *R);
 
-        bi_refine(tmpB);
-        bi_refine(tmpR);
-
-        if (bi_compareABS(&tmpR, &tmpB) != COMPARE_LESS) {
+        if (bi_compare(R, B) != COMPARE_LESS) {
             /* Q = Q + (1 << j) */
             (*Q)->a[j / WORD_BITLEN] ^= ((word)1 << (j % WORD_BITLEN));
 
             /* R - B */
             bi_subc(R, R, B);
         }
-        bi_delete(&tmpB);
-        bi_delete(&tmpR);
     }
 
     bi_refine(*Q);
     bi_refine(*R);
 
+    return CLEAR;
+}
+
+msg bi_mod(UPDATE bigint** remainder, IN bigint** divisor) {
+    bigint* Q = NULL, * R = NULL;
+    bi_long_div(&Q, &R, remainder, divisor);
+    bi_assign(remainder, R);
+
+    bi_delete(&Q);
+    bi_delete(&R);
     return CLEAR;
 }
 
@@ -570,7 +549,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     }
 
     /* Zero Divisor 체크 */
-    if (((*B)->word_len == 1) && ((*B)->a[0] == 0x0)) {
+    if (bi_zero_check(B)) {
         fprintf(stderr, ZeroDivisorErrMsg);
         return ZeroDivisorErr;
     }
@@ -582,17 +561,11 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
     (*B)->sign = NON_NEGATIVE;  // B 절댓값
     bi_long_div(Q, R, A, B);  // 절댓값 기준 나눗셈 수행
 
-    /* A가 음수인 경우 Q = Q + 1, R = B - R */
-    if (sign_A == NEGATIVE) {
-        bigint* one = NULL;
-        bi_set_from_string(&one, "1", 2);  // 1 생성
-        bi_addc(Q, Q, &one);
-        bi_delete(&one);
 
-        bigint* new_R = NULL;
-        bi_sub(&new_R, B, R);
-        bi_assign(R, new_R);  // R 업데이트
-        bi_delete(&new_R);
+    /* A가 음수인 경우 Q = Q + 1, R = B - R */
+    if (sign_A == NEGATIVE && !bi_zero_check(R)) {
+        bi_plus_one(Q);
+        bi_sub(R, B, R);
     }
 
     (*Q)->sign = (sign_A == sign_B) ? NON_NEGATIVE : NEGATIVE;
@@ -604,7 +577,7 @@ msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B) {
 }
 
 msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
-    
+
     if ((*X == NULL) || (*M == NULL)) {
         fprintf(stderr, DSTpNULLErrMsg);
         return DSTpNULLErr;
@@ -613,38 +586,24 @@ msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) 
     /* t 초기화: t = 1 */
     bi_set_from_string(C, "1", 2);
 
-
     /* N의 전체 비트 길이 계산 */
     int total_bits = (*N)->word_len * WORD_BITLEN;
 
     /* Left-to-Right Modular Exponentiation */
     for (int i = total_bits - 1; i >= 0; i--) {
         /* t = t^2 */
-        bigint* t_tmp = NULL;
-        bi_assign(&t_tmp, *C);
-        bi_karatsuba_mulc(C, &t_tmp, &t_tmp);
-        bi_delete(&t_tmp);
-        
+        bi_karatsuba_mulc(C, C, C);
+
         /* t = t mod M */
-        bigint* Q = NULL, * R = NULL;
-        bi_long_div(&Q, &R, C, M);
-        bi_assign(C, R);
-        bi_delete(&Q);
-        bi_delete(&R);
+        bi_mod(C, M);
 
         /* 현재 비트 검사: ni = (N >> i) & 1 */
         if (((*N)->a[i / WORD_BITLEN] & ((word)1 << (i % WORD_BITLEN))) != 0) {
             /* t = t * X */
-            bigint* t_tmp2 = NULL;
-            bi_assign(&t_tmp2, *C);
-            bi_karatsuba_mulc(C, &t_tmp2, X);
-            bi_delete(&t_tmp2);
+            bi_karatsuba_mulc(C, C, X);
 
             /* t = t mod M */
-            bi_long_div(&Q, &R, C, M);
-            bi_assign(C, R);
-            bi_delete(&Q);
-            bi_delete(&R);
+            bi_mod(C, M);
         }
     }
 
@@ -652,7 +611,7 @@ msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) 
 }
 
 msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) {
-    
+
     if ((*X == NULL) || (*M == NULL)) {
         fprintf(stderr, DSTpNULLErrMsg);
         return DSTpNULLErr;
@@ -660,8 +619,9 @@ msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) 
 
     bigint* t1 = NULL;
     /* t0, t1 초기화: t0 = 1, t1 = X */
-    bi_set_from_string(C, "1", 2);
+    bi_set_one(C);
     bi_assign(&t1, *X);
+
     /* N의 전체 비트 길이 계산 */
     int total_bits = (*N)->word_len * WORD_BITLEN;
 
@@ -670,28 +630,15 @@ msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M) 
         /* 현재 비트 검사: ni = (N >> i) & 1 */
         if (((*N)->a[i / WORD_BITLEN] & ((word)1 << (i % WORD_BITLEN))) != 0) {
             /* t0 = t0*t1^Ni */
-            bigint* t0_tmp = NULL;
-            bi_assign(&t0_tmp, *C);
-            bi_karatsuba_mulc(C, &t0_tmp, &t1);
-            bi_delete(&t0_tmp);
-            
+            bi_karatsuba_mulc(C, C, &t1);
+
             /* t0 = t0 mod M */
-            bigint* Q = NULL, * R = NULL;
-            bi_long_div(&Q, &R, C, M);
-            bi_assign(C, R);
-            bi_delete(&Q);
-            bi_delete(&R);
+            bi_mod(C, M);
         }
         /* t1 = t1^2 mod M */
-        bigint* t1_tmp = NULL;
-        bi_assign(&t1_tmp, t1);
-        bi_karatsuba_mulc(&t1, &t1_tmp, &t1_tmp);
-        bi_delete(&t1_tmp);
-        bigint* Q = NULL, * R = NULL;
-        bi_long_div(&Q, &R, &t1, M);
-        bi_assign(&t1, R);
-        bi_delete(&Q);
-        bi_delete(&R);
+        bi_karatsuba_mulc(&t1, &t1, &t1);
+
+        bi_mod(&t1, M);
     }
     return CLEAR;
 }
@@ -733,11 +680,8 @@ msg bi_barrett_red(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T) 
     bi_refine(*N);
 
     /* R >= N이라면 R - N 수행 */
-    while (bi_compareABS(R, N) != COMPARE_LESS) {
-        bigint* new_R = NULL;
-        bi_sub(&new_R, R, N);
-        bi_assign(R, new_R);
-        bi_delete(&new_R);
+    while (bi_compare(R, N) != COMPARE_LESS) {
+        bi_sub(R, R, N);
     }
     bi_delete(&Q_hat);
     bi_delete(&A_tmp);

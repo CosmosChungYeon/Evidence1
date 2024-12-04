@@ -14,7 +14,7 @@
  * @param[in] c 이전 연산의 carry 비트
  * @return 덧셈 후 carry 비트 반환
  */
-msg bi_add_ABc(OUT word* C, IN word* A, IN word* B, IN int c);
+msg bi_add_ABc(OUT word* result, IN word* op1, IN word* op2, IN int carry_in);
 
 /**
  * @brief carry와 두 개의 부호가 같은 큰 정수의 덧셈(word_len(A) >= word_len(B))
@@ -24,7 +24,7 @@ msg bi_add_ABc(OUT word* C, IN word* A, IN word* B, IN int c);
  * @param[in] B 두 번째 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-msg bi_addc(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_addc(OUT bigint** result, IN bigint** op1, IN bigint** op2);
 
 
 //msg bi_addc_using_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
@@ -48,7 +48,7 @@ msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B);
  * @param[in] B 두 번째 배열(뺄 배열)
  * @return 뺄셈 후 borrow 비트 반환
  */
-msg bi_sub_AbB(OUT word* C, IN word* A, IN int b, IN word* B);
+msg bi_sub_AbB(OUT word* result, IN word* op1, IN int borrow_in, IN word* op2);
 
 /**
  * @brief borrow와 두 개의 부호가 같은 큰 정수의 뺄셈(A >= B > 0)
@@ -58,7 +58,7 @@ msg bi_sub_AbB(OUT word* C, IN word* A, IN int b, IN word* B);
  * @param[in] B 두 번째 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-msg bi_subc(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_subc(OUT bigint** result, IN bigint** op1, IN bigint** op2);
 
 /**
  * @brief 두 개의 큰 정수의 뺄셈
@@ -132,6 +132,8 @@ msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
  */
 msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
 
+msg bi_mod(UPDATE bigint** remainder, IN bigint** divisor);
+
 /**
  * @brief 부호 고려 나눗셈
  *
@@ -174,7 +176,7 @@ msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
  * @param[in] T 사전 계산 가능한 값 큰 정수의 이중 포인터
  * @return 성공 실패 여부 반환
  */
-// 한계: word 8bit 시 test에서 워드 길이가 A 또는 N이 1씩 감소해서 에러 발생
+ // 한계: word 8bit 시 test에서 워드 길이가 A 또는 N이 1씩 감소해서 에러 발생
 msg bi_barrett_red(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
 
 #endif  // CALC_OPERATIONS_H

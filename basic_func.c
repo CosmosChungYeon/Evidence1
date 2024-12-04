@@ -296,7 +296,7 @@ msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base) {
             fprintf(file, "0");
         }
     }
-    
+
     return CLEAR;
 }
 
@@ -453,9 +453,17 @@ msg bi_compare(IN bigint** A, IN bigint** B) {
         return ((*A)->sign == NON_NEGATIVE) ? COMPARE_GREATER : COMPARE_LESS;
     }
 
-    /* 절댓값 비교 */
-    msg ret = bi_compareABS(A, B);
+    bigint* tmpA = NULL, * tmpB = NULL;
+    bi_assign(&tmpA, *A);
+    bi_assign(&tmpB, *B);
+    bi_refine(tmpA);
+    bi_refine(tmpB);
 
+    /* 절댓값 비교 */
+    msg ret = bi_compareABS(&tmpA, &tmpB);
+
+    bi_delete(&tmpA);
+    bi_delete(&tmpB);
     /* 부호에 따라 결과 조정 */
     return ((*A)->sign == NON_NEGATIVE) ? ret : ret * (-1);
 }
@@ -537,5 +545,23 @@ msg bi_doubling(UPDATE bigint* X) {
         X->a[X->word_len - 1] = carry;  // 새로 추가된 MSB 워드에 carry 저장
     }
 
+    return CLEAR;
+}
+
+msg bi_plus_one(UPDATE bigint** dst) {
+    bigint* one = NULL;
+    bi_set_from_string(&one, "1", 2);  // 1 생성
+
+    bi_addc(dst, dst, &one);
+    bi_delete(&one);
+    return CLEAR;
+}
+
+msg bi_zero_check(IN bigint** src) {
+    return (((*src)->word_len == 1) && ((*src)->a[0] == 0x0));
+}
+
+msg bi_set_one(UPDATE bigint** dst) {
+    bi_set_from_string(dst, "1", 2);
     return CLEAR;
 }

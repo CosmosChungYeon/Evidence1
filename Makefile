@@ -2,8 +2,8 @@
 
 # 변수 정의
 CC = gcc
-CFLAGS = -g
-SRC = basic_func.c main.c
+CFLAGS = -g -O2
+SRC = DH.c test.c rand.c array_func.c calc_operation.c basic_func.c main.c
 OBJ = $(SRC:.c=.o)
 EXEC = main.exe
 

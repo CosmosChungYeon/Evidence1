@@ -6,9 +6,9 @@
 #include <time.h>
 
 msg test_bi_add(int test_num) {
-    
+
     double exec_time = 0;
-    
+
     FILE* file = fopen("bi_add_test_output.txt", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
@@ -25,9 +25,9 @@ msg test_bi_add(int test_num) {
         int A_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
         int B_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
         result = bi_get_random(&A, A_word_len);
-        result = bi_get_random(&B, B_word_len); 
-        
-        
+        result = bi_get_random(&B, B_word_len);
+
+
         fprintf(file, "a = ");
         bi_fprint(file, A, 16);
         fprintf(file, "\n");
@@ -330,7 +330,7 @@ msg test_bi_mul(int test_num) {
         result = bi_get_random(&B, B_word_len);
 
         fprintf(file, "a = ");
-        bi_fprint(file,  A, 16);
+        bi_fprint(file, A, 16);
         fprintf(file, "\n");
         fprintf(file, "b = ");
         bi_fprint(file, B, 16);
@@ -538,14 +538,14 @@ msg test_bi_barrett_red(int test_num) {
         bigint* Re = NULL;
         bigint* T = NULL;
         msg result;
-        
+
 
         int N_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
         int A_word_len = N_word_len << 1;
 
         result = bi_get_random(&A, A_word_len);
         result = bi_get_random(&N, N_word_len);
-        
+
         A->sign = NON_NEGATIVE;
         N->sign = NON_NEGATIVE;
 
@@ -581,7 +581,7 @@ msg test_bi_barrett_red(int test_num) {
         fprintf(file, "R = a %% N\n");
         fprintf(file, "if (R != ");
         bi_fprint(file, R, 16);
-        fprintf(file,"):\n");
+        fprintf(file, "):\n");
         fprintf(file, "    print('R = ', hex(R))\n");
         fprintf(file, "    print('wrong R = ', hex(");
         bi_fprint(file, R, 16);
@@ -616,11 +616,11 @@ msg test_bi_l2r_mod_exp(int test_num) {
         bigint* X = NULL;
         bigint* N = NULL;
         bigint* M = NULL;
-       
+
         msg result;
 
         int X_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
-        int N_word_len = 1;
+        int N_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
         int M_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
 
         result = bi_get_random(&X, X_word_len);
@@ -687,7 +687,7 @@ msg test_bi_r2l_mod_exp(int test_num) {
         bigint* X = NULL;
         bigint* N = NULL;
         bigint* M = NULL;
-       
+
         msg result;
 
         int X_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;

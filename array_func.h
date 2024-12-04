@@ -23,6 +23,10 @@ msg array_init(UPDATE word* a, IN int word_len);
  */
 msg array_copy(OUT word* dst, IN word* src, IN int word_len);
 
+msg array_copy_high(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len);
+
+msg array_copy_low(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len);
+
 /**
  * @brief 대상 배열을 무작위 값으로 채움
  *

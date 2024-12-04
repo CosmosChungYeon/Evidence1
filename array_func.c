@@ -23,6 +23,30 @@ msg array_copy(OUT word* dst, IN word* src, IN int word_len) {
     return CLEAR;
 }
 
+msg array_copy_high(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len) {
+    for (int i = 0; i < dst_word_len; i++) {
+        if (i + dst_word_len < src_word_len) {
+            dst[i] = src[i + dst_word_len];
+        }
+        else {
+            dst[i] = 0;  // 나머지는 0으로 채움
+        }
+    }
+    return CLEAR;
+}
+
+msg array_copy_low(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len) {// A0: 하위 부분 복사
+    for (int i = 0; i < dst_word_len; i++) {
+        if (i < src_word_len) {
+            dst[i] = src[i];
+        }
+        else {
+            dst[i] = 0;  // 나머지는 0으로 채움
+        }
+    }
+    return CLEAR;
+}
+
 msg array_rand(OUT word* dst, IN int word_len) {
     byte* p = (byte*)dst;                           // dst 포인터주소를 byte type으로 변경
     int cnt = WORD_ARR_BYTELEN(word_len);           // 배열의 바이트 길이
