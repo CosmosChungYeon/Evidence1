@@ -7,7 +7,7 @@
 #include "bi_def.h"
 #include <string.h>
 
-msg bi_dh_private_key_gen(OUT bigint** key, IN bigint** p);
+msg bi_dh_private_key_gen(OUT bigint** key, IN bigint** q);
 
 msg bi_dh_public_key_gen(OUT bigint** gA, IN bigint** g, IN bigint** key, IN bigint** p);
 

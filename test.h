@@ -15,4 +15,6 @@ msg test_bi_barrett_red(int test_num);
 msg test_bi_l2r_mod_exp(int test_num);
 msg test_bi_r2l_mod_exp(int test_num);
 
+msg test_DH_1024_160(int test_num);
+
 #endif  // TEST_H

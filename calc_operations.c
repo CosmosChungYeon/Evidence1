@@ -397,7 +397,6 @@ msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B) {
     bigint* S1 = NULL, * S0 = NULL;
     bigint* S = NULL;
     bigint *tmp = NULL;
-    bi_new(&tmp, n + m);
 
     bi_new(&A1, lw_len); bi_new(&A0, lw_len);
     bi_new(&B1, lw_len); bi_new(&B0, lw_len);

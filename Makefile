@@ -3,9 +3,9 @@
 # 변수 정의
 CC = gcc
 CFLAGS = -g -O2
-SRC = DH.c test.c rand.c array_func.c calc_operation.c basic_func.c main.c
-OBJ = $(SRC:.c=.o)
-EXEC = main.exe
+SRC = DH.c test.c rand.c array_func.c calc_operations.c basic_func.c main.c
+OBJ = $(SRC:.c=.c)
+EXEC = main
 
 # 기본 목표
 all: $(EXEC)
