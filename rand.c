@@ -1,15 +1,15 @@
 #include "rand.h"
 
 byte DRBG() {
-    return rand() % 0xff;   // 미완
+    return rand() % 0xff;   // This feature is not yet fully implemented.
 }
 
 byte byte_rand() {
-    // USE_DRBG 값에 따른 함수 선정
+    /* Choose the function based on the USE_DRBG value */
 #if   USE_DRBG == 0
-    return rand() % 0xff;   // stdlib 내장 rand() 사용
+    return rand() % 0xff;   // Use stdlib's rand() function
 #elif USE_DRBG == 1
-    return DRBG();
+    return DRBG();          // Use DRBG
 #else
     fprintf(stderr, UnSupportUseDRBGValErrMsg);
     return DRBG();

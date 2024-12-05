@@ -1,28 +1,37 @@
-# Makefile for compiling C project
+# Makefile for compiling C project (Cross-platform)
 
-# 변수 정의
+# Detect OS
+ifeq ($(OS),Windows_NT)
+    RM = del
+    EXEC = main.exe
+else
+    RM = rm -f
+    EXEC = main
+endif
+
+# Variables
 CC = gcc
 CFLAGS = -g -O2
 SRC = DH.c test.c rand.c array_func.c calc_operations.c basic_func.c main.c
-OBJ = $(SRC:.c=.c)
-EXEC = main
+# Explicitly define OBJ files
+OBJ = $(patsubst %.c, %.o, $(SRC))
 
-# 기본 목표
+# Default goal
 all: $(EXEC)
 
-# 실행 파일 생성
+# Link object files to create the executable
 $(EXEC): $(OBJ)
-	$(CC) $(OBJ) -o $(EXEC)
+	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)
 
-# 객체 파일 생성
+# Compile source files to object files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# clean 목표: 생성된 파일 삭제
+# Clean up generated files
 clean:
-	del $(OBJ) $(EXEC)
+	$(RM) $(OBJ) $(EXEC)
 
-# run 목표: 프로그램 실행
+# Run the program
 run: $(EXEC)
 	./$(EXEC)
 

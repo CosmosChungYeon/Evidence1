@@ -5,136 +5,155 @@
 #include "array_func.h"
 
 /**
- * @brief 주어진 부호, 배열 길이, 배열에서 큰 정수 설정
+ * @brief Set a large integer with a given sign, array length, and array
  *
- * @param[out] dst 대상 큰 정수의 이중 포인터
- * @param[in] sign 부호
- * @param[in] word_len 배열의 길이
- * @param[in] a 배열
- * @return 성공 실패 여부 반환
+ * @param[out] dst Pointer to the target large integer
+ * @param[in] sign Sign of the large integer (NON_NEGATIVE or NEGATIVE)
+ * @param[in] word_len Length of the array
+ * @param[in] a Array representing the large integer
+ * @return Success or failure
  */
 msg bi_set_from_array(OUT bigint** dst, IN int sign, IN int word_len, IN const word* a);
 
 /**
- * @brief 지정된 진수의 문자열에서 큰 정수 설정
+ * @brief Set a large integer from a string in a specified base
  *
- * @param[out] dst 대상 큰 정수의 이중 포인터
- * @param[in] int_str 문자열
- * @param[in] base 진수(2, 10, 16)
- * @note 음수이면 문자열은 "-"로 시작
- * @return 성공 실패 여부 반환
+ * @param[out] dst Pointer to the target large integer
+ * @param[in] int_str Input string
+ * @param[in] base Base of the number (2, 10, 16)
+ * @note If negative, the string should start with '-'
+ * @return Success or failure
  */
 msg bi_set_from_string(OUT bigint** dst, IN const char* int_str, IN int base);
 
 /**
- * @brief 무작위 값으로 지정된 배열 길이의 큰 정수 초기화
+ * @brief Initialize a large integer of specified length with random values
  *
- * @param[out] dst 대상 큰 정수의 이중 포인터
- * @param[in] word_len 배열의 길이
- * @return 성공 실패 여부 반환
+ * @param[out] dst Pointer to the target large integer
+ * @param[in] word_len Length of the array
+ * @return Success or failure
  */
 msg bi_get_random(OUT bigint** dst, IN int word_len);
 
 /**
- * @brief 지정된 진수로 큰 정수 출력
+ * @brief Print a large integer in the specified base
  *
- * @param[in] dst 대상 큰 정수의 포인터
- * @param[in] base 진수(2, 10, 16)
- * @return 성공 실패 여부 반환
+ * @param[in] dst Pointer to the target large integer
+ * @param[in] base Base of the number (2, 16)
+ * @return Success or failure
  */
-msg bi_print(IN const bigint* dst, IN int base); // const**
+msg bi_print(IN const bigint* dst, IN int base);
 
 /**
- * @brief 지정된 진수로 큰 정수 파일 출력
+ * @brief Print a large integer to a file in the specified base
  *
- * @param[in] dst 대상 큰 정수의 포인터
- * @param[in] base 진수(2, 10, 16)
- * @return 성공 실패 여부 반환
+ * @param[in] file File pointer
+ * @param[in] dst Pointer to the target large integer
+ * @param[in] base Base of the number (2, 16)
+ * @return Success or failure
  */
 msg bi_fprint(IN FILE* file, IN const bigint* dst, IN int base);
 
 /**
- * @brief 지정된 배열 길이로 큰 정수 초기화
+ * @brief Initialize a large integer with the specified array length
  *
- * @param[out] dst 대상 큰 정수의 이중 포인터
- * @param[in] word_len 배열의 길이
- * @return 성공 실패 여부 반환
+ * @param[out] dst Pointer to the target large integer
+ * @param[in] word_len Length of the array
+ * @return Success or failure
  */
 msg bi_new(OUT bigint** dst, IN int word_len);
 
 /**
- * @brief 대상 큰 정수에 할당된 메모리 해제
+ * @brief Free the memory allocated for a large integer
  *
- * @param[in, out] dst 삭제할 대상 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the target large integer
+ * @return Success or failure
  */
 msg bi_delete(UPDATE bigint** dst);
 
 /**
- * @brief 대상 큰 정수의 메모리 재할당(배열 길이 줄이는 용도)
+ * @brief Reallocate memory for a large integer (used to reduce array length)
  *
- * @param[in, out] dst 메모리 재할당할 대상 큰 정수의 포인터
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the target large integer
+ * @return Success or failure
  */
 msg bi_refine(UPDATE bigint* dst);
 
 /**
- * @brief src 큰 정수를 대상 큰 정수로 복사
+ * @brief Copy a source large integer into a target large integer
  *
- * @param[in, out] dst 대상 큰 정수의 이중 포인터
- * @param[in] src src 큰 정수의 포인터
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the target large integer
+ * @param[in] src Pointer to the source large integer
+ * @return Success or failure
  */
 msg bi_assign(UPDATE bigint** dst, IN const bigint* src);
 
 /**
- * @brief 두 개의 큰 정수의 절댓값 비교
+ * @brief Compare the absolute values of two large integers
  *
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return |A| > |B|이면 COMPARE_GREATER, |A| < |B|이면 COMPARE_LESS, |A| == |B|이면 COMPARE_EQUAL
+ * @param[in] A Pointer to the first large integer
+ * @param[in] B Pointer to the second large integer
+ * @return COMPARE_GREATER if |A| > |B|, COMPARE_LESS if |A| < |B|, COMPARE_EQUAL if |A| == |B|
  */
 msg bi_compareABS(IN bigint** A, IN bigint** B);
 
 /**
- * @brief 부호 고려한 두 개의 큰 정수 비교
+ * @brief Compare two large integers considering their signs
  *
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return A > B이면 COMPARE_GREATER, A < B이면 COMPARE_LESS, A == B이면 COMPARE_EQUAL
+ * @param[in] A Pointer to the first large integer
+ * @param[in] B Pointer to the second large integer
+ * @return COMPARE_GREATER if A > B, COMPARE_LESS if A < B, COMPARE_EQUAL if A == B
  */
 msg bi_compare(IN bigint** A, IN bigint** B);
 
 /**
- * @brief 워드 단위로 Left Shift
+ * @brief Perform a left shift on a large integer by word units
  *
- * @param[in] T Left Shift 대상 큰 정수의 이중 포인터
- * @param[in] shift_words shift 이동량
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the large integer
+ * @param[in] shift_count Number of words to shift
+ * @return Success or failure
  */
-msg bi_word_shift_left(UPDATE bigint** T, IN int shift_words);
+msg bi_word_shift_left(UPDATE bigint** dst, IN int shift_count);
 
 /**
- * @brief 워드 단위로 Right Shift
+ * @brief Perform a right shift on a large integer by word units
  *
- * @param[in] T Right Shift 대상 큰 정수의 이중 포인터
- * @param[in] shift_words shift 이동량
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the large integer
+ * @param[in] shift_count Number of words to shift
+ * @return Success or failure
  */
-msg bi_word_shift_right(UPDATE bigint** T, IN int shift_words);
+msg bi_word_shift_right(UPDATE bigint** dst, IN int shift_count);
 
 /**
- * @brief bigint 워드 값 더블링(2배)
+ * @brief Double the value of a large integer
  *
- * @param[in] R 더블링 대상 큰 정수의 포인터
- * @return 성공 실패 여부 반환
+ * @param[in, out] dst Pointer to the large integer
+ * @return Success or failure
  */
-msg bi_doubling(UPDATE bigint* X);
+msg bi_doubling(UPDATE bigint* dst);
 
+/**
+ * @brief Add one to a large integer
+ *
+ * @param[in, out] dst Pointer to the large integer
+ * @return Success or failure
+ */
 msg bi_plus_one(UPDATE bigint** dst);
 
+/**
+ * @brief Check if a large integer is zero
+ *
+ * @param[in] src Pointer to the large integer
+ * @return True if zero, false otherwise
+ */
 msg bi_zero_check(IN bigint** src);
 
+/**
+ * @brief Set a large integer to one
+ *
+ * @param[in, out] dst Pointer to the large integer
+ * @return Success or failure
+ */
 msg bi_set_one(UPDATE bigint** dst);
 
 #endif  // BASIC_FUNC_H

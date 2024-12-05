@@ -5,14 +5,14 @@
 
 /**
  * @struct bigint
- * @brief 큰 정수를 나타내는 구조체
+ * @brief Structure representing a large integer
  *
- * 큰 정수에 대한 부호, 배열 길이, 배열에 대한 정보 저장
+ * This structure stores information about the sign, word length, and array of a large integer
  */
 typedef struct {
-	int sign;		// 부호값
-	int word_len;	// 워드 길이
-	word* a;		// 워드 배열
+	int sign;		// Sign value
+	int word_len;	// Word Length
+	word* a;		// Array of words
 } bigint;
 
 #define OUT			// OUTPUT

@@ -5,34 +5,52 @@
 #include "rand.h"
 
 /**
- * @brief 배열 값 0으로 초기화
+ * @brief Initialize an array with zero values
  *
- * @param[out] a 초기화할 배열
- * @param[in] word_len 배열의 길이
- * @return 초기화 여부 반환 (성공: CLEAR, 실패: NOTInitErr)
+ * @param[out] arr The array to be initialized
+ * @param[in] word_len The length of the array
+ * @return Initialization status (Success: CLEAR, Failure: NOTInitErr)
  */
-msg array_init(UPDATE word* a, IN int word_len);
+msg array_init(UPDATE word* arr, IN int word_len);
 
 /**
- * @brief src 배열을 대상 배열로 배열 복사
+ * @brief Copy values from the source array to the destination array
  *
- * @param[out] dst 복사 대상 배열
- * @param[in] src 복사할 src 배열
- * @param[in] word_len 배열의 길이
- * @return 복사 성공 여부 반환
+ * @param[out] dst The destination array
+ * @param[in] src The source array to copy from
+ * @param[in] word_len The length of the array
+ * @return Status of the copy operation
  */
 msg array_copy(OUT word* dst, IN word* src, IN int word_len);
 
+/**
+ * @brief Copy high-order values from the source array to the destination array
+ *
+ * @param[out] dst The destination array
+ * @param[in] src The source array to copy from
+ * @param[in] dst_word_len The length of the destination array
+ * @param[in] src_word_len The length of the source array
+ * @return Status of the copy operation
+ */
 msg array_copy_high(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len);
 
+/**
+ * @brief Copy low-order values from the source array to the destination array
+ *
+ * @param[out] dst The destination array
+ * @param[in] src The source array to copy from
+ * @param[in] dst_word_len The length of the destination array
+ * @param[in] src_word_len The length of the source array
+ * @return Status of the copy operation
+ */
 msg array_copy_low(OUT word* dst, IN word* src, IN int dst_word_len, IN int src_word_len);
 
 /**
- * @brief 대상 배열을 무작위 값으로 채움
+ * @brief Fill the target array with random values
  *
- * @param[out] dst 무작위 값으로 채워지는 배열
- * @param[in] word_len 배열의 길이
- * @return 무작위 할당 성공 여부
+ * @param[out] dst The array to be filled with random values
+ * @param[in] word_len The length of the array
+ * @return Status of the random assignment
  */
 msg array_rand(OUT word* dst, IN int word_len);
 

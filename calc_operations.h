@@ -1,182 +1,184 @@
 #ifndef CALC_OPERATIONS_H
 #define CALC_OPERATIONS_H
+
 #include "basic_func.h"
-#include "config.h"
-#include "bi_def.h"
-#include <string.h>
 
 /**
- * @brief carry와 두 배열의 덧셈
+ * @brief Addition of two words with a carry
  *
- * @param[out] C 결과 배열의 포인터
- * @param[in] A 첫 번째 배열
- * @param[in] B 두 번째 배열
- * @param[in] c 이전 연산의 carry 비트
- * @return 덧셈 후 carry 비트 반환
+ * @param[out] result Pointer to store the result
+ * @param[in] op1 First word
+ * @param[in] op2 Second word
+ * @param[in] carry_in Carry from the previous operation
+ * @return Carry bit after the addition
  */
 msg bi_add_ABc(OUT word* result, IN word* op1, IN word* op2, IN int carry_in);
 
 /**
- * @brief carry와 두 개의 부호가 같은 큰 정수의 덧셈(word_len(A) >= word_len(B))
+ * @brief Addition of two big integers with the same sign and carry
+ *        (word_len(op1) >= word_len(op2))
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] result Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
 msg bi_addc(OUT bigint** result, IN bigint** op1, IN bigint** op2);
 
-
-//msg bi_addc_using_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
+/**
+ * @brief Addition of two big integers
+ *
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
+ */
+msg bi_add(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief 두 개의 큰 정수의 덧셈
+ * @brief Subtraction of two words with a borrow
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to store the result
+ * @param[in] op1 First word
+ * @param[in] borrow_in Borrow from the previous operation
+ * @param[in] op2 Second word (to subtract)
+ * @return Borrow bit after the subtraction
  */
-msg bi_add(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_sub_AbB(OUT word* res, IN word* op1, IN int borrow_in, IN word* op2);
 
 /**
- * @brief A 배열에서 B 배열과 borrow 뺄셈
+ * @brief Subtraction of two big integers with the same sign and borrow (A >= B > 0)
  *
- * @param[out] C 결과 배열의 포인터
- * @param[in] A 첫 번째 배열
- * @param[in] b 이전 연산의 borrow 비트
- * @param[in] B 두 번째 배열(뺄 배열)
- * @return 뺄셈 후 borrow 비트 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_sub_AbB(OUT word* result, IN word* op1, IN int borrow_in, IN word* op2);
+msg bi_subc(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief borrow와 두 개의 부호가 같은 큰 정수의 뺄셈(A >= B > 0)
+ * @brief Subtraction of two big integers
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_subc(OUT bigint** result, IN bigint** op1, IN bigint** op2);
+msg bi_sub(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief 두 개의 큰 정수의 뺄셈
+ * @brief Multiplication of two single words
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Array to store the result of the word multiplication
+ * @param[in] A First word
+ * @param[in] B Second word
+ * @return Success or failure status
  */
-msg bi_sub(OUT bigint** C, IN bigint** A, IN bigint** B);
-
+msg bi_mul_AB(OUT word res[2], IN word* A, IN word* B);
 
 /**
- * @brief 단일 워드 곱셈
+ * @brief Textbook multiplication for big integers
  *
- * @param[out] C[2] 단일 워드 곱셈 결과 반환
- * @param[in] A 첫 번째 단일 워드
- * @param[in] B 두 번째 단일 워드
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_mul_AB(OUT word C[2], IN word* A, IN word* B);
+msg bi_textbook_mulc(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief textbook 곱셈
+ * @brief Improved textbook multiplication for big integers
  *
- * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_textbook_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_improved_textbook_mulc(bigint** res, bigint** op1, bigint** op2);
 
 /**
- * @brief improved textbook 곱셈
+ * @brief Karatsuba multiplication for big integers
  *
- * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_improved_textbook_mulc(bigint** C, bigint** A, bigint** B);
+msg bi_Karatsuba_mulc(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief karatsuba 곱셈
+ * @brief Signed multiplication of two big integers
  *
- * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] op1 Pointer to the first big integer
+ * @param[in] op2 Pointer to the second big integer
+ * @return Success or failure status
  */
-msg bi_karatsuba_mulc(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_mul(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
- * @brief 부호 고려 곱셈
+ * @brief Long division with bits
  *
- * @param[out] C 워드 곱셈 결과 큰 정수의 이중 포인터
- * @param[in] A 첫 번째 큰 정수의 이중 포인터
- * @param[in] B 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] quot Pointer to the quotient big integer
+ * @param[out] rem Pointer to the remainder big integer
+ * @param[in] divd Pointer to the dividend big integer
+ * @param[in] divs Pointer to the divisor big integer
+ * @return Success or failure status
  */
-msg bi_mul(OUT bigint** C, IN bigint** A, IN bigint** B);
+msg bi_long_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint** divs);
 
 /**
- * @brief long division bit 나눗셈
+ * @brief Modulus operation for big integers
  *
- * @param[out] Q 나눗셈 결과 몫 큰 정수의 이중 포인터
- * @param[out] R 나눗셈 결과 나머지 큰 정수의 이중 포인터
- * @param[in] A dividend 첫 번째 큰 정수의 이중 포인터
- * @param[in] B divisor 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[in, out] rem Pointer to the remainder big integer (updated)
+ * @param[in] divs Pointer to the divisor big integer
+ * @return Success or failure status
  */
-msg bi_long_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
-
-msg bi_mod(UPDATE bigint** remainder, IN bigint** divisor);
+msg bi_mod(UPDATE bigint** rem, IN bigint** divs);
 
 /**
- * @brief 부호 고려 나눗셈
+ * @brief Signed division of two big integers
  *
- * @param[out] Q 나눗셈 결과 몫 큰 정수의 이중 포인터
- * @param[out] R 나눗셈 결과 나머지 큰 정수의 이중 포인터
- * @param[in] A dividend 첫 번째 큰 정수의 이중 포인터
- * @param[in] B divisor 두 번째 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] quot Pointer to the quotient big integer
+ * @param[out] rem Pointer to the remainder big integer
+ * @param[in] divd Pointer to the dividend big integer
+ * @param[in] divs Pointer to the divisor big integer
+ * @return Success or failure status
  */
-msg bi_div(OUT bigint** Q, OUT bigint** R, IN bigint** A, IN bigint** B);
+msg bi_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint** divs);
 
 /**
- * @brief left to right modular exponentiation (C = X^N mod M)
+ * @brief Left-to-right modular exponentiation (res = base^exp mod mod)
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] X 대상 큰 정수의 이중 포인터
- * @param[in] N 지수 큰 정수의 이중 포인터
- * @param[in] M modular 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] base Pointer to the base big integer
+ * @param[in] exp Pointer to the exponent big integer
+ * @param[in] mod Pointer to the modulus big integer
+ * @return Success or failure status
  */
-msg bi_l2r_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+msg bi_l2r_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigint** mod);
 
 /**
- * @brief right to left modular exponentiation (C = X^N mod M)
+ * @brief Right-to-left modular exponentiation (res = base^exp mod mod)
  *
- * @param[out] C 결과 큰 정수의 이중 포인터
- * @param[in] X 대상 큰 정수의 이중 포인터
- * @param[in] N 지수 큰 정수의 이중 포인터
- * @param[in] M modular 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] res Pointer to the result big integer
+ * @param[in] base Pointer to the base big integer
+ * @param[in] exp Pointer to the exponent big integer
+ * @param[in] mod Pointer to the modulus big integer
+ * @return Success or failure status
  */
-msg bi_r2l_mod_exp(OUT bigint** C, IN bigint** X, IN bigint** N, IN bigint** M);
+msg bi_r2l_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigint** mod);
 
 /**
- * @brief barrett reduction (A의 워드 길이 = N의 워드 길이의 두 배)
+ * @brief Barrett reduction (Length of divd = 2 * length of mod)
  *
- * @param[out] R reduction 결과 큰 정수의 이중 포인터
- * @param[in] A reduction 대상 큰 정수의 이중 포인터
- * @param[in] N modular 큰 정수의 이중 포인터
- * @param[in] T 사전 계산 가능한 값 큰 정수의 이중 포인터
- * @return 성공 실패 여부 반환
+ * @param[out] rem Pointer to the result (remainder) big integer
+ * @param[in] divd Pointer to the dividend big integer
+ * @param[in] mod Pointer to the modulus big integer
+ * @param[in] precomp Pointer to the precomputed value big integer
+ * @return Success or failure status
+ * @note Limitation: For 8-bit word, test cases fail due to reduced word length in divd or mod
  */
- // 한계: word 8bit 시 test에서 워드 길이가 A 또는 N이 1씩 감소해서 에러 발생
-msg bi_barrett_red(OUT bigint** R, IN bigint** A, IN bigint** N, IN bigint** T);
+msg bi_barrett_red(OUT bigint** rem, IN bigint** divd, IN bigint** mod, IN bigint** precomp);
 
 #endif  // CALC_OPERATIONS_H
