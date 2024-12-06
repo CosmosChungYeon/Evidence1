@@ -791,4 +791,5 @@ msg test_DH_1024_160(int test_num) {
     bi_delete(&g);
 
     printf("DH[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
+    return CLEAR;
 }
