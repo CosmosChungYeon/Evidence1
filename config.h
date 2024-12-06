@@ -48,9 +48,8 @@ typedef uint32_t        word;
 #define FLAG			20      // Karatsuba's FLAG word_len
 #define RAND_CHOICE		1       // Random choice of word length (using in test.c)
 
-/* For Diffie-Hellman. p = 1024-bit, q = 160-bit, g is generator */
+/* For Diffie-Hellman. prime p = 1024-bit, q = 160-bit */
 #define PRIME1024       "599a67c641f4698988a99e769ff894fffc4ae6c6c7ef558b3d02194b2975e297fbb78e450190e5006de413d57e5f71586c53a055d4bd8f84e696be39ce217bdc0e5740a2d3ff45da38190b7ce9e3abefd3a935f381a96f01c7582cfc1602d53043b38e2f543f5c5ee9d921bcb51d978eb8db3abcc2b6d9e54d5dd46acf604505"
-#define PRIME256        "93ee4cd258f13c51a512e87e3e1a9106db935e39"
-#define GENERATOR       "1371a16c9a5547424683c96456460b9a75b7e8b667452d33c365ea5f85e9e79a6b277b1eef45e56bb5b420b93f1a5af90b3784531519f4937577d839512d53b802a41afc2921058b2f1ea3c482e15073d2d381a2ae3452f4bdecd9483e9eb52dcf60e926b79e74a85f6b232065bad4eda418ece4f1a02a79665ff2cc6747ef5b"
+#define PRIME160        "93ee4cd258f13c51a512e87e3e1a9106db935e39"
 
 #endif  // CONFIG_H

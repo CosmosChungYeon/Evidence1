@@ -5,8 +5,27 @@
 #include "calc_operations.h"
 
 /**
+ * @brief Finds a generator g for the given prime p and subgroup order q.
+ *
+ * @details The h, g satisfies the conditions:
+ *          - h is in the range [2, p-2]
+ *          - g ≠ 1 mod p
+ *          This function uses the formula g = h^((p-1)/q) mod p where h is a randomly chosen value.
+ *          
+ * @param[out] g Pointer to the generator bigint** to be computed.
+ * @param[in] p Prime modulus bigint**.
+ * @param[in] q Subgroup order bigint**.
+ * @return Success or failure status.
+ *
+ */
+msg bi_dh_find_generator_g(OUT bigint** g, IN bigint** p, IN bigint** q);
+
+/**
  * @brief Generates a private key for Diffie-Hellman key exchange.
  *
+ * @details The key satisfies the conditions:
+ *          - key is in the range [2, p-1]
+ * 
  * @param[out] key Pointer to store the generated private key.
  * @param[in] q A prime number used as a modulus for the private key generation.
  * @return Status of the key generation (success or failure).

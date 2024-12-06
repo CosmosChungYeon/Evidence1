@@ -19,7 +19,7 @@
 int main() {
     srand(time(NULL));
 
-    int test_num = 50;
+    int test_num = 100;
     test_bi_add(test_num);
     test_bi_sub(test_num);
     test_bi_textbook_mulc(test_num);

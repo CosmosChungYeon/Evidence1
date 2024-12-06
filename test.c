@@ -727,13 +727,14 @@ msg test_DH_1024_160(int test_num) {
     bigint* g = NULL;
 
     bi_set_from_string(&p, PRIME1024, 16);
-    bi_set_from_string(&q, PRIME256, 16);
-    bi_set_from_string(&g, GENERATOR, 16);
-
+    bi_set_from_string(&q, PRIME160, 16);
+    bi_dh_find_generator_g(&g, &p, &q);
+    
     fprintf(file, "p = "); bi_fprint(file, p, 16); fprintf(file, "\n");
     fprintf(file, "q = "); bi_fprint(file, q, 16); fprintf(file, "\n");
     fprintf(file, "g = "); bi_fprint(file, g, 16); fprintf(file, "\n");
-
+    bi_print(q, 16); printf("\n");
+    bi_print(g, 16); printf("\n");
     for (int cnt = 0; cnt < test_num; cnt++) {
         bigint* keyA = NULL;
         bigint* keyB = NULL;
