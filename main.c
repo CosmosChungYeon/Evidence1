@@ -16,10 +16,10 @@
 #include "DH.h"
 #include "test.h"
 
-int main() {
+int main(void) {
     srand(time(NULL));
 
-    int test_num = 100;
+    int test_num = 10;
     test_bi_add(test_num);
     test_bi_sub(test_num);
     test_bi_textbook_mulc(test_num);

@@ -18,13 +18,13 @@ msg bi_dh_find_generator_g(OUT bigint** g, IN bigint** p, IN bigint** q) {
         /* Generate random h in range [2, p-2] */
         do {
             bi_get_random(&h, (*p)->word_len);
-        } while (bi_compareABS(&h, &p_minus_1) != COMPARE_LESS || bi_compare(&h, &one) != COMPARE_GREATER);
+        } while (bi_compareABS(&h, &p_minus_1) != (msg)COMPARE_LESS || bi_compare(&h, &one) != (msg)COMPARE_GREATER);
         h->sign = NON_NEGATIVE;
 
         /* Compute g = h^((p-1)/q) mod p */
         bi_l2r_mod_exp(g, &h, &quot, p);
 
-    } while (bi_compare(g, &one) == COMPARE_EQUAL);  // Repeat until g ≠ 1 mod p
+    } while (bi_compare(g, &one) == (msg)COMPARE_EQUAL);  // Repeat until g ≠ 1 mod p
 
     bi_delete(&h);
     bi_delete(&one);
@@ -46,7 +46,7 @@ msg bi_dh_private_key_gen(OUT bigint** key, IN bigint** q) {
         #if WORD_BITLEN == 64
         (*key)->a[(*key)->word_len - 1] >>= 32;
         #endif
-    } while (bi_compareABS(key, q) != COMPARE_LESS || bi_compare(key, &one) != COMPARE_GREATER);
+    } while (bi_compareABS(key, q) != (msg)COMPARE_LESS || bi_compare(key, &one) != (msg)COMPARE_GREATER);
     (*key)->sign = NON_NEGATIVE;
 
     bi_delete(&one);

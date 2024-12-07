@@ -13,10 +13,10 @@ msg bi_add_ABc(OUT word* res, IN word* op1, IN word* op2, IN int carry_in) {
     carry_out = (*res < *op1) ? CARRY1 : CARRY0; // Check for carry: if op1 + op2 < op1, carry = 1
 
     /* Add the input carry */
-    *res += carry_in;
-    carry_out += (*res < carry_in) ? CARRY1 : CARRY0; // If result + carry_in < carry_in, additional carry
+    *res += (word)carry_in;
+    carry_out += (*res < (word)carry_in) ? CARRY1 : CARRY0; // If result + carry_in < carry_in, additional carry
 
-    return carry_out; // Return the carry out
+    return (msg)carry_out; // Return the carry out
 }
 
 msg bi_addc(OUT bigint** res, IN bigint** op1, IN bigint** op2) {
@@ -109,14 +109,14 @@ msg bi_add(OUT bigint** res, IN bigint** op1, IN bigint** op2) {
 msg bi_sub_AbB(OUT word* res, IN word* op1, IN int borrow_in, IN word* op2) {
     int borrow_out = 0;  // Borrow output (b')
 
-    *res = *op1 - borrow_in;  // Subtract the borrow from the op1
-    borrow_out = (*op1 < borrow_in) ? BORROW1 : BORROW0;  // If op1 < borrow_in, set borrow_out to 1
+    *res = *op1 - (word)borrow_in;  // Subtract the borrow from the op1
+    borrow_out = (*op1 < (word)borrow_in) ? BORROW1 : BORROW0;  // If op1 < borrow_in, set borrow_out to 1
 
     /* If result < op2, update borrow_out and subtract op2 */
     borrow_out = (*res < *op2) ? borrow_out + 1 : borrow_out;
     *res -= *op2;
 
-    return borrow_out;  // Return the borrow output
+    return (msg)borrow_out;  // Return the borrow output
 }
 
 msg bi_subc(OUT bigint** res, IN bigint** op1, IN bigint** op2) {
@@ -507,7 +507,7 @@ msg bi_long_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint
         }
 
         /* Check if remainder is greater than or equal to the divisor */
-        if (bi_compare(rem, divs) != COMPARE_LESS) {
+        if (bi_compare(rem, divs) != (msg)COMPARE_LESS) {
             /* Update quotient: Q = Q + (1 << bit_idx) */
             (*quot)->a[bit_idx / WORD_BITLEN] ^= ((word)1 << (bit_idx % WORD_BITLEN));
 
@@ -674,7 +674,7 @@ msg bi_barrett_red(OUT bigint** rem, IN bigint** divd, IN bigint** mod, IN bigin
     bi_refine(*mod);
 
     /* If rem >= mod, subtract mod until rem < mod */
-    while (bi_compare(rem, mod) != COMPARE_LESS) {
+    while (bi_compare(rem, mod) != (msg)COMPARE_LESS) {
         bi_sub(rem, rem, mod);
     }
     bi_delete(&quot_hat);

@@ -1,10 +1,10 @@
 #include "rand.h"
 
-byte DRBG() {
+byte DRBG(void) {
     return rand() % 0xff;   // This feature is not yet fully implemented.
 }
 
-byte byte_rand() {
+byte byte_rand(void) {
     /* Choose the function based on the USE_DRBG value */
 #if   USE_DRBG == 0
     return rand() % 0xff;   // Use stdlib's rand() function
