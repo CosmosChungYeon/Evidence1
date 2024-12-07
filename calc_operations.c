@@ -578,7 +578,7 @@ msg bi_Karatsuba_sqrc(OUT bigint** res, IN bigint** op1) {
     bigint* T1 = NULL, * T0 = NULL;
     bigint* T_tmp = NULL;
     bigint* S = NULL;
-    bigint *tmp = NULL;
+    bigint* tmp = NULL;
 
     /* Split operand into high and low parts */
     bi_new(&A1, lw_len); bi_new(&A0, lw_len);
@@ -803,6 +803,7 @@ msg bi_r2l_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigin
 
         bi_mod(&t1, mod);
     }
+    bi_delete(&t1);
     return CLEAR;
 }
 
