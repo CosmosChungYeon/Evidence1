@@ -484,30 +484,24 @@ msg bi_sqr_A(OUT word res[2], IN word* A) {
     word A0 = *A & WORD_MASK;                       
 
     /* Compute partial products */
-    word C1 = A1 * A1;                              
-    word C0 = A0 * A0;
-
-    word T = A0 * A1;
-
-    /* Compute the low part of the result (C0) */
-    word carry_low = 0;                                   
-
-    for (int idx = 0; idx < 2; idx++){
-        C0 += T << (WORD_BITLEN >> 1);                                  
-        if (C0 < T << (WORD_BITLEN >> 1)) {                             
-            carry_low += (word)1;
-        }
-    }
+    bigint* C = NULL;
+    bigint* T = NULL;
+    bi_new(&C, 2);
+    bi_new(&T, 2);
     
-    /* Compute the high part of the result (C1) */
-    C1 += (T >> (WORD_BITLEN >> 1));
-    C1 += (T >> (WORD_BITLEN >> 1));
-    C1 += (word)carry_low;
+    C->a[1] = A1 * A1;
+    C->a[0] = A0 * A0;
 
-    /* Store the result in the output array */
-    res[1] = C1;                                    // High part of result
-    res[0] = C0;                                    // Low part of result
+    T->a[0] = (A0 * A1) << (WORD_BITLEN >> 1);
+    T->a[1] = ((A0 * A1) >> (WORD_BITLEN >> 1)) & WORD_MASK;
+    bi_doubling(T);
+    bi_add(&C, &C, &T);
 
+    res[0] = C->a[0];
+    res[1] = C->a[1];
+
+    bi_delete(&C);
+    bi_delete(&T);
     return CLEAR;
 }
 
