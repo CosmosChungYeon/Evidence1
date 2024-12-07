@@ -478,6 +478,179 @@ msg bi_mul(OUT bigint** res, IN bigint** op1, IN bigint** op2) {
     return CLEAR;
 }
 
+msg bi_sqr_A(OUT word res[2], IN word* A) {
+    /* Split a single word into two parts (upper and lower halves) */
+    word A1 = *A >> (WORD_BITLEN >> 1);             
+    word A0 = *A & WORD_MASK;                       
+
+    /* Compute partial products */
+    word C1 = A1 * A1;                              
+    word C0 = A0 * A0;
+
+    word T = A0 * A1;
+
+    /* Compute the low part of the result (C0) */
+    word carry_low = 0;                                   
+
+    for (int idx = 0; idx < 2; idx++){
+        C0 += T << (WORD_BITLEN >> 1);                                  
+        if (C0 < T << (WORD_BITLEN >> 1)) {                             
+            carry_low += (word)1;
+        }
+    }
+    
+    /* Compute the high part of the result (C1) */
+    C1 += (T >> (WORD_BITLEN >> 1));
+    C1 += (T >> (WORD_BITLEN >> 1));
+    C1 += (word)carry_low;
+
+    /* Store the result in the output array */
+    res[1] = C1;                                    // High part of result
+    res[0] = C0;                                    // Low part of result
+
+    return CLEAR;
+}
+
+msg bi_textbook_sqrc(OUT bigint** res, IN bigint** op1) {
+    int op1_wlen = (*op1)->word_len;
+
+    bigint* tmp = NULL;
+    bi_new(&tmp, (2 * op1_wlen));
+
+    /* Temporary bigint to store intermediate Aj * Bi results */
+    bigint* T1 = NULL;
+    bigint* T2 = NULL;
+
+    bigint* C1 = NULL;
+    bigint* C2 = NULL;
+
+    bi_new(&C1, 1);
+    bi_new(&C2, 1);
+
+    /* Perform the multiplication operation for all words in both operands */
+    for (int Aj = 0; Aj < op1_wlen; Aj++) {
+        bi_new(&T1, 2);
+            
+        /* Multiply the words at indices Aj and Bi */
+        bi_sqr_A(T1->a, &((*op1)->a[Aj]));
+
+        /* Shift the result to the correct position based on word indices Aj and Bi */
+        bi_word_shift_left(&T1, (2 * Aj));
+
+        bi_add(&C1, &T1, &C1);
+
+        for (int Bi = Aj + 1; Bi < op1_wlen; Bi++) {
+            bi_new(&T2, 2);
+            
+            bi_mul_AB(T2->a, &((*op1)->a[Bi]),&((*op1)->a[Aj]));
+            
+            bi_word_shift_left(&T2, (Aj + Bi));
+        
+            bi_add(&C2, &C2, &T2);
+        }
+    }
+
+    bi_doubling(C2);
+    bi_add(&tmp, &C1, &C2);
+
+    bi_delete(&T1);
+    bi_delete(&T2);
+    bi_delete(&C1);
+    bi_delete(&C2);
+
+    bi_assign(res, tmp);
+    bi_delete(&tmp);
+
+    return bi_refine(*res);
+}
+
+msg bi_Karatsuba_sqrc(OUT bigint** res, IN bigint** op1) {
+    int op1_wlen = (*op1)->word_len;
+    /* If operand is zero, return zero */
+    if (bi_zero_check(op1)) {
+        bi_new(res, 1);
+        (*res)->a[0] = 0;
+        return CLEAR;
+    }
+
+    /* Base case: Use the improved textbook multiplication if the size is below the threshold */
+    if (op1_wlen <= FLAG) {
+        return bi_textbook_sqrc(res, op1);
+    }
+
+    int lw_len = (op1_wlen + 1) >> 1;
+
+    bigint* A1 = NULL, * A0 = NULL;
+    bigint* T1 = NULL, * T0 = NULL;
+    bigint* T_tmp = NULL;
+    bigint* S = NULL;
+    bigint *tmp = NULL;
+
+    /* Split operand into high and low parts */
+    bi_new(&A1, lw_len); bi_new(&A0, lw_len);
+    array_copy_high(A1->a, (*op1)->a, lw_len, op1_wlen);
+    array_copy_low(A0->a, (*op1)->a, lw_len, op1_wlen);
+
+    /* Recursively compute A1*A1 and A0*A0 */
+    bi_Karatsuba_sqrc(&T1, &A1);
+    bi_Karatsuba_sqrc(&T0, &A0);
+
+    /* Compute C = (T1 << 2*lw) + T0 */
+    bi_assign(&T_tmp, T1);
+    bi_word_shift_left(&T_tmp, 2 * lw_len);
+    bi_add(&tmp, &T_tmp, &T0);
+
+    bi_Karatsuba_mulc(&S, &A1, &A0);
+
+    /* Shift S left by lw+1 bits */
+    bi_word_shift_left(&S, lw_len);
+    bi_doubling(S);
+
+    /* Final result: C = C + S */
+    bi_add(res, &tmp, &S);
+
+    bi_delete(&A1);
+    bi_delete(&A0);
+    bi_delete(&S);
+    bi_delete(&T1);
+    bi_delete(&T_tmp);
+    bi_delete(&T0);
+    bi_delete(&tmp);
+
+    return bi_refine(*res);
+}
+
+msg bi_naive_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint** divs) {
+    /* Check if dividend or divisor is NULL */
+    if (*divd == NULL || *divs == NULL) {
+        fprintf(stderr, SrcNULLErrMsg);
+        return SrcNULLErr;
+    }
+
+    /* Check for zero divisor */
+    if (bi_zero_check(divs)) {
+        fprintf(stderr, ZeroDivisorErrMsg);
+        return ZeroDivisorErr;
+    }
+
+    bigint* one = NULL; 
+    bi_set_one(&one);
+
+    bi_assign(rem, *divd);
+    bi_new(quot, 1);
+
+    /* Naive Division: Repeated subtraction */
+    while (bi_compareABS(rem, divs) != (msg)COMPARE_LESS) {
+        bi_add(quot, quot, &one);
+        bi_sub(rem, rem, divs);
+    }
+
+    bi_refine(*quot);
+    bi_refine(*rem);
+    bi_delete(&one);
+    return CLEAR;
+}
+
 msg bi_long_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint** divs) {
     /* Check if dividend or divisor is NULL */
     if (*divd == NULL || *divs == NULL) {
@@ -588,7 +761,7 @@ msg bi_l2r_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigin
     /* Left-to-Right Modular Exponentiation */
     for (int bit_idx = total_exp_bits - 1; bit_idx >= 0; bit_idx--) {
         /* t = t^2 */
-        bi_Karatsuba_mulc(res, res, res);
+        bi_Karatsuba_sqrc(res, res);
 
         /* t = t mod M */
         bi_mod(res, mod);
@@ -632,7 +805,7 @@ msg bi_r2l_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigin
             bi_mod(res, mod);
         }
         /* t1 = t1^2 mod M */
-        bi_Karatsuba_mulc(&t1, &t1, &t1);
+        bi_Karatsuba_sqrc(&t1, &t1);
 
         bi_mod(&t1, mod);
     }

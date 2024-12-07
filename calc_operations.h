@@ -117,6 +117,55 @@ msg bi_Karatsuba_mulc(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 msg bi_mul(OUT bigint** res, IN bigint** op1, IN bigint** op2);
 
 /**
+ * @brief Computes the square of a single word.
+ *
+ * @param[out] res Array to store the result of squaring the input word. 
+ *                 The result consists of two words (res[0] = LSB, res[1] = MSB).
+ * @param[in]  A   Pointer to the word to be squared.
+ * @return     Status code indicating success or failure of the operation.
+ *
+ * @note This function squares a single word and stores the result in a two-word array.
+ */
+msg bi_sqr_A(OUT word res[2], IN word* A);
+
+/**
+ * @brief Computes the square of a big integer using the textbook squaring method.
+ *
+ * @param[out] res Pointer to the resulting big integer after squaring.
+ * @param[in]  op1 Pointer to the big integer to be squared.
+ * @return     Status code indicating success or failure of the operation.
+ *
+ * @details This function implements the textbook algorithm for squaring a big integer.
+ *          It computes each partial product and accumulates the results.
+ * @note The result `res` is refined to remove any leading zeros.
+ */
+msg bi_textbook_sqrc(OUT bigint** res, IN bigint** op1);
+
+/**
+ * @brief Computes the square of a big integer using the Karatsuba squaring method.
+ *
+ * @param[out] res Pointer to the resulting big integer after squaring.
+ * @param[in]  op1 Pointer to the big integer to be squared.
+ * @return     Status code indicating success or failure of the operation.
+ *
+ * @details This function uses the Karatsuba algorithm for squaring, which is faster than
+ *          the textbook method for large inputs by reducing the number of multiplications.
+ * @note The result `res` is refined to remove any leading zeros.
+ */
+msg bi_Karatsuba_sqrc(OUT bigint** res, IN bigint** op1);
+
+/**
+ * @brief Naive division
+ *
+ * @param[out] quot Pointer to the quotient big integer
+ * @param[out] rem Pointer to the remainder big integer
+ * @param[in] divd Pointer to the dividend big integer
+ * @param[in] divs Pointer to the divisor big integer
+ * @return Success or failure status
+ */
+msg bi_naive_div(OUT bigint** quot, OUT bigint** rem, IN bigint** divd, IN bigint** divs);
+
+/**
  * @brief Long division with bits
  *
  * @param[out] quot Pointer to the quotient big integer

@@ -26,6 +26,9 @@ int main(void) {
     test_bi_improved_textbook_mulc(test_num);
     test_bi_Karatsuba_mulc(test_num);
     test_bi_mul(test_num);
+    test_bi_textbook_sqrc(test_num);
+    test_bi_Karatsuba_sqrc(test_num);
+    test_bi_naive_div(test_num);
     test_bi_long_div(test_num);
     test_bi_div(test_num);
     test_bi_barrett_red(test_num);

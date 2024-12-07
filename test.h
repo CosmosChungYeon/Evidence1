@@ -48,6 +48,27 @@ msg test_bi_Karatsuba_mulc(int test_num);
 msg test_bi_mul(int test_num);
 
 /**
+ * @brief Tests the textbook squaring function for big integers.
+ * @param[in] test_num The test case number or identifier for the squaring function.
+ * @return     Status code indicating success or failure of the test.
+ */
+msg test_bi_textbook_sqrc(int test_num);
+
+/**
+ * @brief Tests the Karatsuba squaring function for big integers.
+ * @param[in] test_num The test case number or identifier for the squaring function.
+ * @return     Status code indicating success or failure of the test.
+ */
+msg test_bi_Karatsuba_sqrc(int test_num);
+
+/**
+ * @brief Tests the Naive division algorithm.
+ * @param test_num The test case number to execute.
+ * @return The result of the naive division test as a `msg`.
+ */
+msg test_bi_naive_div(int test_num);
+
+/**
  * @brief Tests the long division algorithm.
  * @param test_num The test case number to execute.
  * @return The result of the long division test as a `msg`.

@@ -353,6 +353,174 @@ msg test_bi_mul(int test_num) {
     return CLEAR;
 }
 
+msg test_bi_textbook_sqrc(int test_num) {
+    double exec_time = 0;
+    FILE* file = fopen("bi_textbook_sqrc_test_output.txt", "w");
+    if (file == NULL) {
+        fprintf(stderr, FileErrorMsg);
+        return FileError;
+    }
+    fprintf(file, "fail_cnt = 0\n");
+    for (int cnt = 0; cnt < test_num; cnt++) {
+        bigint* op1 = NULL;
+        bigint* res = NULL;
+
+        int op1_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        bi_get_random(&op1, op1_word_len);
+
+        op1->sign = NON_NEGATIVE;
+
+        fprintf(file, "op1 = ");
+        bi_fprint(file, op1, 16);
+        fprintf(file, "\n");
+
+        clock_t start, end;
+        start = clock();
+
+        bi_textbook_sqrc(&res, &op1);
+        end = clock();
+        double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        bi_delete(&op1);
+        fprintf(file, "res = op1 * op1\n");
+        fprintf(file, "if (res != ");
+        bi_fprint(file, res, 16);
+        fprintf(file, "):\n");
+        fprintf(file, "    print('op1 = ', hex(op1))\n");
+        fprintf(file, "    print('res = ', hex(res))\n");
+        fprintf(file, "    print('wrong_res = ', hex(");
+        bi_fprint(file, res, 16);
+        fprintf(file, "))\n");
+        fprintf(file, "    fail_cnt = fail_cnt + 1\n");
+        bi_delete(&res);
+        exec_time += duration;
+    }
+    fprintf(file, "print(fail_cnt)\n");
+    fclose(file);
+
+    printf("textbook_sqrc[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
+    return CLEAR;
+}
+
+msg test_bi_Karatsuba_sqrc(int test_num) {
+    double exec_time = 0;
+    FILE* file = fopen("bi_Karatsuba_sqrc_test_output.txt", "w");
+    if (file == NULL) {
+        fprintf(stderr, FileErrorMsg);
+        return FileError;
+    }
+    fprintf(file, "fail_cnt = 0\n");
+    for (int cnt = 0; cnt < test_num; cnt++) {
+        bigint* op1 = NULL;
+        bigint* res = NULL;
+
+        int op1_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        bi_get_random(&op1, op1_word_len);
+
+        op1->sign = NON_NEGATIVE;
+
+        fprintf(file, "op1 = ");
+        bi_fprint(file, op1, 16);
+        fprintf(file, "\n");
+
+        clock_t start, end;
+        start = clock();
+
+        bi_Karatsuba_sqrc(&res, &op1);
+        end = clock();
+        double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        bi_delete(&op1);
+        fprintf(file, "res = op1 * op1\n");
+        fprintf(file, "if (res != ");
+        bi_fprint(file, res, 16);
+        fprintf(file, "):\n");
+        fprintf(file, "    print('op1 = ', hex(op1))\n");
+        fprintf(file, "    print('res = ', hex(res))\n");
+        fprintf(file, "    print('wrong_res = ', hex(");
+        bi_fprint(file, res, 16);
+        fprintf(file, "))\n");
+        fprintf(file, "    fail_cnt = fail_cnt + 1\n");
+        bi_delete(&res);
+        exec_time += duration;
+    }
+    fprintf(file, "print(fail_cnt)\n");
+    fclose(file);
+
+    printf("Karatsuba_sqrc[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
+    return CLEAR;
+}
+
+msg test_bi_naive_div(int test_num) {
+    double exec_time = 0;
+    FILE* file = fopen("bi_naive_div_test_output.txt", "w");
+    if (file == NULL) {
+        fprintf(stderr, FileErrorMsg);
+        return FileError;
+    }
+    fprintf(file, "fail_cnt = 0\n");
+
+    for (int cnt = 0; cnt < test_num; cnt++) {
+        bigint* divd = NULL;
+        bigint* divs = NULL;
+        bigint* quot = NULL;
+        bigint* rem = NULL;
+
+        int divd_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        int divs_word_len = (RAND_CHOICE) ? 1 + rand() % (TEST_WORD_LEN - 1) : TEST_WORD_LEN;
+        bi_get_random(&divd, divd_word_len);
+        bi_get_random(&divs, divs_word_len);
+
+        divd->sign = NON_NEGATIVE;
+        divs->sign = NON_NEGATIVE;
+
+        fprintf(file, "divd = ");
+        bi_fprint(file, divd, 16);
+        fprintf(file, "\n");
+        fprintf(file, "divs = ");
+        bi_fprint(file, divs, 16);
+        fprintf(file, "\n");
+
+        clock_t start, end;
+        start = clock();
+
+        bi_naive_div(&quot, &rem, &divd, &divs);
+
+        end = clock();
+        double duration = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        bi_delete(&divd);
+        bi_delete(&divs);
+        fprintf(file, "quot = divd // divs\n");
+        fprintf(file, "rem = divd %% divs\n");
+        fprintf(file, "if (quot != ");
+        bi_fprint(file, quot, 16);
+        fprintf(file, " or rem != ");
+        bi_fprint(file, rem, 16);
+        fprintf(file, "):\n");
+        fprintf(file, "    print('divd = ', hex(divd))\n");
+        fprintf(file, "    print('divs = ', hex(divs))\n");
+        fprintf(file, "    print('quot = ', hex(quot))\n");
+        fprintf(file, "    print('rem = ', hex(rem))\n");
+        fprintf(file, "    print('wrong_quot = ', hex(");
+        bi_fprint(file, quot, 16);
+        fprintf(file, "))\n");
+        fprintf(file, "    print('wrong_rem = ', hex(");
+        bi_fprint(file, rem, 16);
+        fprintf(file, "))\n");
+        fprintf(file, "    fail_cnt = fail_cnt + 1\n");
+        bi_delete(&quot);
+        bi_delete(&rem);
+        exec_time += duration;
+    }
+    fprintf(file, "print(fail_cnt)\n");
+    fclose(file);
+
+    printf("naive_div[test_num = %d] execution Time: %.6f seconds\n", test_num, exec_time);
+    return CLEAR;
+}
+
+
 msg test_bi_long_div(int test_num) {
     double exec_time = 0;
     FILE* file = fopen("bi_long_div_test_output.txt", "w");
