@@ -19,6 +19,13 @@
 int main(void) {
     srand(time(NULL));
 
+    printf("[TEST WORDBIT : %d BIT]\n", WORD_BITLEN);
+    if(RAND_CHOICE){
+        printf("RAND TEST WORD LEN\n");
+    }
+    else{
+        printf("FIXED TEST WORD LEN\n");
+    }
     int test_num = 100;
     test_bi_add(test_num);
     test_bi_sub(test_num);
@@ -28,7 +35,9 @@ int main(void) {
     test_bi_mul(test_num);
     test_bi_textbook_sqrc(test_num);
     test_bi_Karatsuba_sqrc(test_num);
-    test_bi_naive_div(test_num);
+    if (!RAND_CHOICE) {
+        test_bi_naive_div(test_num);
+    }
     test_bi_long_div(test_num);
     test_bi_div(test_num);
     test_bi_barrett_red(test_num);

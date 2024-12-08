@@ -480,30 +480,31 @@ msg bi_mul(OUT bigint** res, IN bigint** op1, IN bigint** op2) {
 
 msg bi_sqr_A(OUT word res[2], IN word* A) {
     /* Split a single word into two parts (upper and lower halves) */
-    word A1 = *A >> (WORD_BITLEN >> 1);             
-    word A0 = *A & WORD_MASK;                       
+    word A1 = (*A) >> (WORD_BITLEN >> 1);            
+    word A0 = (*A) & WORD_MASK;                       
 
     /* Compute partial products */
-    bigint* C = NULL;
-    bigint* T = NULL;
-    bi_new(&C, 2);
-    bi_new(&T, 2);
+    word C1 = A1 * A1;
+    word C0 = A0 * A0;
+
+    word T0 = (A0 * A1) << (WORD_BITLEN >> 1);
+    word T1 = ((A0 * A1) >> (WORD_BITLEN >> 1)) & WORD_MASK;
     
-    C->a[1] = A1 * A1;
-    C->a[0] = A0 * A0;
+    T1 = (T1 << 1) + ((T0 & MSB_BIT_MASK) >> (WORD_BITLEN - 1));
+    T0 = T0 << 1;
+    
+    word C0_carry = 0;
+    C0 += T0;
+    if(C0 < T0){
+        C0_carry = 1;
+    }
+    C1 = C1 + T1 + C0_carry;
 
-    T->a[0] = (A0 * A1) << (WORD_BITLEN >> 1);
-    T->a[1] = ((A0 * A1) >> (WORD_BITLEN >> 1)) & WORD_MASK;
-    bi_doubling(T);
-    bi_add(&C, &C, &T);
-
-    res[0] = C->a[0];
-    res[1] = C->a[1];
-
-    bi_delete(&C);
-    bi_delete(&T);
+    res[0] = C0;
+    res[1] = C1;
     return CLEAR;
 }
+
 
 msg bi_textbook_sqrc(OUT bigint** res, IN bigint** op1) {
     int op1_wlen = (*op1)->word_len;
@@ -536,7 +537,7 @@ msg bi_textbook_sqrc(OUT bigint** res, IN bigint** op1) {
         for (int Bi = Aj + 1; Bi < op1_wlen; Bi++) {
             bi_new(&T2, 2);
             
-            bi_mul_AB(T2->a, &((*op1)->a[Bi]),&((*op1)->a[Aj]));
+            bi_mul_AB(T2->a, &((*op1)->a[Bi]), &((*op1)->a[Aj]));
             
             bi_word_shift_left(&T2, (Aj + Bi));
         
@@ -768,6 +769,8 @@ msg bi_l2r_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigin
             /* t = t mod M */
             bi_mod(res, mod);
         }
+        // printf("\nres%d : ", bit_idx);
+        // bi_print(res,16);
     }
 
     return CLEAR;
