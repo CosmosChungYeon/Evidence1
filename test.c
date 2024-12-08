@@ -6,7 +6,7 @@
 msg test_bi_add(int test_num) {
     double exec_time = 0;
 
-    FILE* file = fopen("bi_add_test_output.txt", "w");
+    FILE* file = fopen("bi_add_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -63,7 +63,7 @@ msg test_bi_add(int test_num) {
 
 msg test_bi_sub(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_sub_test_output.txt", "w");
+    FILE* file = fopen("bi_sub_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -119,7 +119,7 @@ msg test_bi_sub(int test_num) {
 
 msg test_bi_textbook_mulc(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_textbook_mulc_test_output.txt", "w");
+    FILE* file = fopen("bi_textbook_mulc_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -178,7 +178,7 @@ msg test_bi_textbook_mulc(int test_num) {
 
 msg test_bi_improved_textbook_mulc(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_improved_mulc_test_output.txt", "w");
+    FILE* file = fopen("bi_improved_mulc_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -238,7 +238,7 @@ msg test_bi_improved_textbook_mulc(int test_num) {
 
 msg test_bi_Karatsuba_mulc(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_Karatsuba_mulc_test_output.txt", "w");
+    FILE* file = fopen("bi_Karatsuba_mulc_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -298,7 +298,7 @@ msg test_bi_Karatsuba_mulc(int test_num) {
 
 msg test_bi_mul(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_mul_test_output.txt", "w");
+    FILE* file = fopen("bi_mul_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -355,7 +355,7 @@ msg test_bi_mul(int test_num) {
 
 msg test_bi_textbook_sqrc(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_textbook_sqrc_test_output.txt", "w");
+    FILE* file = fopen("bi_textbook_sqrc_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -404,7 +404,7 @@ msg test_bi_textbook_sqrc(int test_num) {
 
 msg test_bi_Karatsuba_sqrc(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_Karatsuba_sqrc_test_output.txt", "w");
+    FILE* file = fopen("bi_Karatsuba_sqrc_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -453,7 +453,7 @@ msg test_bi_Karatsuba_sqrc(int test_num) {
 
 msg test_bi_naive_div(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_naive_div_test_output.txt", "w");
+    FILE* file = fopen("bi_naive_div_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -523,7 +523,7 @@ msg test_bi_naive_div(int test_num) {
 
 msg test_bi_long_div(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_long_div_test_output.txt", "w");
+    FILE* file = fopen("bi_long_div_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -592,7 +592,7 @@ msg test_bi_long_div(int test_num) {
 
 msg test_bi_div(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_div_test_output.txt", "w");
+    FILE* file = fopen("bi_div_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -669,7 +669,7 @@ msg test_bi_div(int test_num) {
 
 msg test_bi_barrett_red(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_barrett_reduction_test_output.txt", "w");
+    FILE* file = fopen("bi_barrett_reduction_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -749,7 +749,7 @@ msg test_bi_barrett_red(int test_num) {
 
 msg test_bi_l2r_mod_exp(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_l2r_modular_exp_test_output.txt", "w");
+    FILE* file = fopen("bi_l2r_modular_exp_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -816,7 +816,7 @@ msg test_bi_l2r_mod_exp(int test_num) {
 
 msg test_bi_r2l_mod_exp(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("bi_r2l_modular_exp_test_output.txt", "w");
+    FILE* file = fopen("bi_r2l_modular_exp_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
@@ -883,7 +883,7 @@ msg test_bi_r2l_mod_exp(int test_num) {
 
 msg test_DH_1024_160(int test_num) {
     double exec_time = 0;
-    FILE* file = fopen("DH_1024_160_test_output.txt", "w");
+    FILE* file = fopen("DH_1024_160_test_output.py", "w");
     if (file == NULL) {
         fprintf(stderr, FileErrorMsg);
         return FileError;
