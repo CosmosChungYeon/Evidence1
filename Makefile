@@ -10,7 +10,7 @@ else
 endif
 
 # Variables
-CC = gcc
+CC ?= gcc
 CFLAGS = -std=c99 -Wall -Wextra -pedantic -O2 -g
 SRC = DH.c test.c rand.c array_func.c calc_operations.c basic_func.c main.c
 OBJ = $(patsubst %.c, %.o, $(SRC))
