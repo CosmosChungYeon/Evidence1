@@ -10,7 +10,7 @@ else
 endif
 
 # Variables
-CC ?= gcc
+CC = gcc
 CFLAGS = -std=c99 -Wall -Wextra -pedantic -O2 -g
 SRC = DH.c test.c rand.c array_func.c calc_operations.c basic_func.c main.c
 OBJ = $(patsubst %.c, %.o, $(SRC))
@@ -18,7 +18,7 @@ OBJ = $(patsubst %.c, %.o, $(SRC))
 # Default goal
 all: $(EXEC)
 
-# Link object files to create the executable
+# Link object files to create the executaWble
 $(EXEC): $(OBJ)
 	@echo "Linking files into $(EXEC)..."
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)

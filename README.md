@@ -50,10 +50,11 @@
 
 ### **Windows**
 1. **MinGW 또는 Clang**을 사용하여 컴파일
+   MinGW 사용 시 makefile에서 CC = gcc
    ```bash
    mingw32-make
    ```
-   Clang 사용 시
+   Clang 사용 시 makefile에서 CC = clang
    ```bash
    mingw32-make CC=clang
    ```

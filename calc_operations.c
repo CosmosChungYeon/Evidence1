@@ -769,10 +769,7 @@ msg bi_l2r_mod_exp(OUT bigint** res, IN bigint** base, IN bigint** exp, IN bigin
             /* t = t mod M */
             bi_mod(res, mod);
         }
-        // printf("\nres%d : ", bit_idx);
-        // bi_print(res,16);
     }
-
     return CLEAR;
 }
 
